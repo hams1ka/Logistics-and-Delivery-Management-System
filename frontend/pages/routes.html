@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Routes — LogiOps</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',sans-serif;background:#f0f2f5;display:flex;min-height:100vh}
+    .sidebar{width:240px;min-height:100vh;background:#1a1f36;color:#fff;display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100}
+    .sidebar-brand{padding:20px 16px;border-bottom:1px solid #2e3457}
+    .sidebar-brand h5{font-size:13px;font-weight:700;color:#7c83fd;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
+    .sidebar-brand p{font-size:11px;color:#8892b0;margin:0}
+    .sidebar-nav{padding:12px 0;flex:1}
+    .nav-section-label{font-size:10px;font-weight:700;color:#4a5568;letter-spacing:1.5px;text-transform:uppercase;padding:14px 20px 6px}
+    .sidebar-nav a{display:flex;align-items:center;gap:10px;padding:10px 20px;color:#a0aec0;text-decoration:none;font-size:13.5px;transition:all .2s;border-left:3px solid transparent}
+    .sidebar-nav a:hover,.sidebar-nav a.active{background:#252b4a;color:#fff;border-left-color:#7c83fd}
+    .sidebar-nav a i{font-size:16px;width:20px}
+    .sidebar-footer{padding:14px 20px;font-size:11px;color:#4a5568;border-top:1px solid #2e3457}
+    .main{margin-left:240px;flex:1;display:flex;flex-direction:column}
+    .topbar{background:#fff;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:50}
+    .topbar h4{font-size:16px;font-weight:700;color:#1a1f36;margin:0}
+    .content{padding:28px}
+    .stat-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+    .stat-box{flex:1;min-width:130px;background:#fff;border-radius:10px;padding:18px;text-align:center;border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+    .stat-box .val{font-size:24px;font-weight:700;color:#1a1f36}
+    .stat-box .lbl{font-size:11px;color:#718096;margin-top:4px}
+    .panel{background:#fff;border-radius:12px;border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:24px;overflow:hidden}
+    .panel-header{padding:16px 20px;border-bottom:1px solid #f0f2f5;display:flex;align-items:center;justify-content:space-between}
+    .panel-header h6{font-size:14px;font-weight:700;color:#1a1f36;margin:0}
+    .data-table{width:100%;border-collapse:collapse;font-size:13px}
+    .data-table th{background:#f7f8fc;padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #e2e8f0}
+    .data-table td{padding:11px 14px;border-bottom:1px solid #f0f2f5;color:#2d3748}
+    .data-table tr:last-child td{border-bottom:none}
+    .data-table tr:hover td{background:#f7f8fc}
+    .btn-add{background:#7c83fd;color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px}
+    .btn-edit{background:#dbeafe;color:#1d4ed8;border:none;padding:4px 10px;border-radius:6px;font-size:12px;cursor:pointer}
+    .btn-delete{background:#fee2e2;color:#dc2626;border:none;padding:4px 10px;border-radius:6px;font-size:12px;cursor:pointer;margin-left:4px}
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;align-items:center;justify-content:center}
+    .modal-overlay.open{display:flex}
+    .modal-box{background:#fff;border-radius:14px;width:400px;padding:28px;box-shadow:0 8px 32px rgba(0,0,0,.15)}
+    .modal-box h5{font-size:15px;font-weight:700;color:#1a1f36;margin-bottom:20px}
+    .form-group{margin-bottom:14px}
+    .form-group label{font-size:12px;font-weight:600;color:#4a5568;display:block;margin-bottom:5px}
+    .form-group input{width:100%;padding:9px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none}
+    .form-group input:focus{border-color:#7c83fd}
+    .modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+    .btn-cancel{background:#f7f8fc;color:#4a5568;border:1px solid #e2e8f0;padding:8px 18px;border-radius:8px;font-size:13px;cursor:pointer}
+    .btn-save{background:#7c83fd;color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:13px;cursor:pointer}
+    .toast{position:fixed;bottom:24px;right:24px;background:#1a1f36;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;z-index:999;display:none}
+    .spinner{display:inline-block;width:18px;height:18px;border:2px solid #e2e8f0;border-top-color:#7c83fd;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .bar-wrap{background:#f0f2f5;border-radius:6px;height:10px;overflow:hidden;margin-top:4px}
+    .bar-fill{height:100%;background:#7c83fd;border-radius:6px;transition:width .5s}
+  </style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-brand"><h5>&#9650; LogiOps</h5><p>Delivery Management System</p></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <a href="../index.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <div class="nav-section-label">Manage</div>
+    <a href="drivers.html"><i class="bi bi-person-badge"></i> Drivers</a>
+    <a href="vehicles.html"><i class="bi bi-truck"></i> Vehicles</a>
+    <a href="orders.html"><i class="bi bi-box-seam"></i> Orders</a>
+    <a href="deliveries.html"><i class="bi bi-send"></i> Deliveries</a>
+    <a href="assignments.html"><i class="bi bi-clipboard-check"></i> Assignments</a>
+    <a href="locations.html"><i class="bi bi-geo-alt"></i> Locations</a>
+    <a href="routes.html" class="active"><i class="bi bi-signpost-split"></i> Routes</a>
+    <a href="servicehistory.html"><i class="bi bi-tools"></i> Service History</a>
+    <div class="nav-section-label">Analytics</div>
+    <a href="reports.html"><i class="bi bi-bar-chart-line"></i> Reports</a>
+    <div class="nav-label" style="font-size:10px;font-weight:700;color:#4a5568;letter-spacing:1.5px;text-transform:uppercase;padding:14px 20px 6px">Chapter 4</div>
+<a href="normalization.html"><i class="bi bi-diagram-3"></i> Normalization</a>
+  </nav>
+  <div class="sidebar-footer">logistics_db &nbsp;|&nbsp; MySQL</div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <h4><i class="bi bi-signpost-split me-2"></i>Routes</h4>
+    <button class="btn-add" onclick="openModal()"><i class="bi bi-plus-lg"></i> Add Route</button>
+  </div>
+  <div class="content">
+    <div class="stat-row" id="route-stats">
+      <div class="stat-box"><div class="val" id="s-avg">—</div><div class="lbl">Avg Distance (km)</div></div>
+      <div class="stat-box"><div class="val" id="s-max">—</div><div class="lbl">Max Distance (km)</div></div>
+      <div class="stat-box"><div class="val" id="s-min">—</div><div class="lbl">Min Distance (km)</div></div>
+      <div class="stat-box"><div class="val" id="s-total">—</div><div class="lbl">Total Distance (km)</div></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <h6>All Routes</h6>
+        <span id="route-count" style="font-size:12px;color:#718096"></span>
+      </div>
+      <div style="padding:0">
+        <table class="data-table">
+          <thead><tr><th>Route ID</th><th>Distance (km)</th><th>Visual</th><th>Actions</th></tr></thead>
+          <tbody id="routes-tbody">
+            <tr><td colspan="4" style="padding:20px;color:#a0aec0"><span class="spinner"></span>Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <h5 id="modal-title">Add New Route</h5>
+    <div class="form-group"><label>Route ID</label><input type="number" id="f-id" placeholder="e.g. 604"/></div>
+    <div class="form-group"><label>Distance (km)</label><input type="number" id="f-distance" placeholder="e.g. 250"/></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveRoute()">Save</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+  const API = 'http://localhost:3000';
+  let editingId = null, maxDist = 1;
+
+  async function loadRouteStats() {
+    try {
+      const res = await fetch(`${API}/api/reports/route-stats`);
+      const d   = await res.json();
+      document.getElementById('s-avg').textContent   = parseFloat(d.Avg_Distance).toFixed(1);
+      document.getElementById('s-max').textContent   = d.Max_Distance;
+      document.getElementById('s-min').textContent   = d.Min_Distance;
+      document.getElementById('s-total').textContent = d.Total_Distance;
+      maxDist = d.Max_Distance;
+    } catch {}
+  }
+
+  async function loadRoutes() {
+    try {
+      const res  = await fetch(`${API}/api/routes`);
+      const data = await res.json();
+      document.getElementById('route-count').textContent = `${data.length} records`;
+      document.getElementById('routes-tbody').innerHTML = data.map(r => `
+        <tr>
+          <td>${r.Route_id}</td>
+          <td>${r.Distance} km</td>
+          <td style="min-width:120px">
+            <div class="bar-wrap">
+              <div class="bar-fill" style="width:${Math.round((r.Distance/maxDist)*100)}%"></div>
+            </div>
+          </td>
+          <td>
+            <button class="btn-edit" onclick='editRoute(${JSON.stringify(r)})'>Edit</button>
+            <button class="btn-delete" onclick="deleteRoute(${r.Route_id})">Delete</button>
+          </td>
+        </tr>`).join('');
+    } catch {
+      document.getElementById('routes-tbody').innerHTML =
+        '<tr><td colspan="4" style="padding:20px;color:#e53e3e">Could not load routes.</td></tr>';
+    }
+  }
+
+  function openModal() {
+    editingId = null;
+    document.getElementById('modal-title').textContent = 'Add New Route';
+    ['f-id','f-distance'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('f-id').disabled = false;
+    document.getElementById('modal').classList.add('open');
+  }
+
+  function closeModal() { document.getElementById('modal').classList.remove('open'); }
+
+  function editRoute(r) {
+    editingId = r.Route_id;
+    document.getElementById('modal-title').textContent  = 'Edit Route';
+    document.getElementById('f-id').value       = r.Route_id;
+    document.getElementById('f-distance').value = r.Distance;
+    document.getElementById('f-id').disabled    = true;
+    document.getElementById('modal').classList.add('open');
+  }
+
+  async function saveRoute() {
+    const distance = document.getElementById('f-distance').value.trim();
+    if (!distance) { showToast('Please enter distance'); return; }
+    const body   = { Distance: parseFloat(distance) };
+    const url    = editingId ? `${API}/api/routes/${editingId}` : `${API}/api/routes`;
+    const method = editingId ? 'PUT' : 'POST';
+    if (!editingId) body.Route_id = parseInt(document.getElementById('f-id').value);
+    try {
+      const res  = await fetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+      const data = await res.json();
+      showToast(data.message || 'Saved');
+      closeModal(); await loadRouteStats(); loadRoutes();
+    } catch { showToast('Error saving'); }
+  }
+
+  async function deleteRoute(id) {
+    if (!confirm(`Delete route ${id}?`)) return;
+    try {
+      await fetch(`${API}/api/routes/${id}`, { method: 'DELETE' });
+      showToast('Deleted'); await loadRouteStats(); loadRoutes();
+    } catch { showToast('Error deleting'); }
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.style.display = 'block';
+    setTimeout(() => t.style.display = 'none', 3000);
+  }
+
+  async function init() { await loadRouteStats(); loadRoutes(); }
+  init();
+</script>
+</body>
+</html>

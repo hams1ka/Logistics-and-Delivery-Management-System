@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Normalization — LogiOps</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:       #0d0f1a;
+      --bg2:      #13162a;
+      --bg3:      #1a1e35;
+      --border:   #252a45;
+      --accent:   #7c83fd;
+      --accent2:  #a78bfa;
+      --green:    #34d399;
+      --amber:    #fbbf24;
+      --red:      #f87171;
+      --cyan:     #22d3ee;
+      --text:     #e2e8f0;
+      --muted:    #64748b;
+      --card:     #161929;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh}
+
+    /* ── Sidebar ── */
+    .sidebar{width:240px;min-height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100}
+    .sidebar-brand{padding:22px 18px 18px;border-bottom:1px solid var(--border)}
+    .sidebar-brand h5{font-size:12px;font-weight:600;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px}
+    .sidebar-brand p{font-size:11px;color:var(--muted)}
+    .sidebar-nav{padding:10px 0;flex:1;overflow-y:auto}
+    .nav-label{font-size:9px;font-weight:600;color:var(--muted);letter-spacing:2px;text-transform:uppercase;padding:14px 18px 5px}
+    .sidebar-nav a{display:flex;align-items:center;gap:10px;padding:9px 18px;color:#8892b0;text-decoration:none;font-size:13px;transition:all .2s;border-left:2px solid transparent}
+    .sidebar-nav a:hover,.sidebar-nav a.active{background:rgba(124,131,253,.08);color:var(--text);border-left-color:var(--accent)}
+    .sidebar-nav a i{font-size:15px;width:18px}
+    .sidebar-footer{padding:12px 18px;font-size:10px;color:var(--muted);border-top:1px solid var(--border)}
+    .main{margin-left:240px;flex:1;min-height:100vh}
+    .topbar{background:var(--bg2);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
+    .topbar h4{font-size:15px;font-weight:600;color:var(--text);margin:0}
+    .topbar-badge{font-size:10px;background:rgba(124,131,253,.15);color:var(--accent);padding:3px 10px;border-radius:20px;border:1px solid rgba(124,131,253,.3);font-family:'DM Mono',monospace}
+    .content{padding:28px}
+
+    /* ── NF tabs ── */
+    .nf-tabs{display:flex;gap:6px;margin-bottom:28px;flex-wrap:wrap}
+    .nf-tab{padding:7px 18px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);color:var(--muted);background:var(--bg2);transition:all .2s;font-family:'DM Sans',sans-serif}
+    .nf-tab.active,.nf-tab:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .nf-section{display:none}
+    .nf-section.active{display:block}
+
+    /* ── Cards ── */
+    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:20px;overflow:hidden}
+    .card-header{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+    .card-header h6{font-size:13px;font-weight:600;color:var(--text);margin:0;flex:1}
+    .card-body{padding:20px}
+    .tag{font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;font-family:'DM Mono',monospace;letter-spacing:.5px}
+    .tag-pitfall{background:rgba(248,113,113,.15);color:var(--red);border:1px solid rgba(248,113,113,.3)}
+    .tag-1nf{background:rgba(34,211,238,.15);color:var(--cyan);border:1px solid rgba(34,211,238,.3)}
+    .tag-2nf{background:rgba(52,211,153,.15);color:var(--green);border:1px solid rgba(52,211,153,.3)}
+    .tag-3nf{background:rgba(251,191,36,.15);color:var(--amber);border:1px solid rgba(251,191,36,.3)}
+    .tag-bcnf{background:rgba(167,139,250,.15);color:var(--accent2);border:1px solid rgba(167,139,250,.3)}
+    .tag-4nf{background:rgba(124,131,253,.15);color:var(--accent);border:1px solid rgba(124,131,253,.3)}
+    .tag-5nf{background:rgba(34,211,238,.15);color:var(--cyan);border:1px solid rgba(34,211,238,.3)}
+    .tag-dep{background:rgba(251,191,36,.12);color:var(--amber);border:1px solid rgba(251,191,36,.25)}
+    .tag-ok{background:rgba(52,211,153,.12);color:var(--green);border:1px solid rgba(52,211,153,.25)}
+    .tag-violation{background:rgba(248,113,113,.12);color:var(--red);border:1px solid rgba(248,113,113,.25)}
+
+    /* ── Tables ── */
+    .dt{width:100%;border-collapse:collapse;font-size:12.5px;font-family:'DM Mono',monospace}
+    .dt th{background:rgba(124,131,253,.08);padding:9px 14px;text-align:left;font-size:10px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid var(--border)}
+    .dt td{padding:9px 14px;border-bottom:1px solid rgba(37,42,69,.6);color:var(--text)}
+    .dt tr:last-child td{border-bottom:none}
+    .dt tr:hover td{background:rgba(124,131,253,.04)}
+    .dt td.pk{color:var(--amber);font-weight:500}
+    .dt td.fk{color:var(--cyan);font-weight:500}
+    .dt td.bad{color:var(--red);text-decoration:line-through;opacity:.7}
+    .dt td.good{color:var(--green)}
+
+    /* ── Dependency arrows ── */
+    .dep-row{display:flex;align-items:center;gap:10px;padding:8px 14px;background:rgba(124,131,253,.04);border-radius:8px;margin-bottom:8px;font-family:'DM Mono',monospace;font-size:12px;flex-wrap:wrap}
+    .dep-key{color:var(--amber);font-weight:500}
+    .dep-arrow{color:var(--muted)}
+    .dep-val{color:var(--text)}
+    .dep-note{font-size:11px;color:var(--muted);margin-left:auto}
+
+    /* ── Before / After grid ── */
+    .ba-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .ba-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+    .ba-label.before{color:var(--red)}
+    .ba-label.after{color:var(--green)}
+
+    /* ── Info box ── */
+    .info-box{background:rgba(124,131,253,.07);border:1px solid rgba(124,131,253,.2);border-radius:10px;padding:14px 18px;margin-bottom:16px;font-size:13px;line-height:1.7;color:#a0aec0}
+    .info-box strong{color:var(--accent)}
+
+    /* ── Rule list ── */
+    .rule-list{list-style:none;padding:0}
+    .rule-list li{padding:7px 0 7px 22px;position:relative;font-size:13px;color:#a0aec0;border-bottom:1px solid rgba(37,42,69,.5)}
+    .rule-list li:last-child{border-bottom:none}
+    .rule-list li::before{content:'→';position:absolute;left:0;color:var(--accent)}
+    .rule-list li strong{color:var(--text)}
+
+    /* ── Section heading ── */
+    .sec-heading{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin:20px 0 10px;display:flex;align-items:center;gap:8px}
+    .sec-heading::after{content:'';flex:1;height:1px;background:var(--border)}
+
+    /* ── Summary banner ── */
+    .summary-banner{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:28px}
+    .sb-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;transition:border-color .2s}
+    .sb-card:hover{border-color:var(--accent)}
+    .sb-card .nf-name{font-size:12px;font-weight:700;margin-bottom:4px;font-family:'DM Mono',monospace}
+    .sb-card .nf-status{font-size:10px;color:var(--green)}
+    .sb-card .nf-desc{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.4}
+
+    .arrow-down{text-align:center;color:var(--muted);font-size:20px;margin:8px 0}
+    .code-block{background:#0a0c18;border:1px solid var(--border);border-radius:8px;padding:14px;font-family:'DM Mono',monospace;font-size:12px;color:#a0aec0;margin:10px 0;overflow-x:auto}
+    .code-block .kw{color:var(--accent)}
+    .code-block .tbl{color:var(--amber)}
+    .code-block .col{color:var(--green)}
+    .code-block .cm{color:var(--muted)}
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <h5>&#9650; LogiOps</h5>
+    <p>Delivery Management System</p>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-label">Main</div>
+    <a href="../index.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <div class="nav-label">Manage</div>
+    <a href="drivers.html"><i class="bi bi-person-badge"></i> Drivers</a>
+    <a href="vehicles.html"><i class="bi bi-truck"></i> Vehicles</a>
+    <a href="orders.html"><i class="bi bi-box-seam"></i> Orders</a>
+    <a href="deliveries.html"><i class="bi bi-send"></i> Deliveries</a>
+    <a href="assignments.html"><i class="bi bi-clipboard-check"></i> Assignments</a>
+    <a href="locations.html"><i class="bi bi-geo-alt"></i> Locations</a>
+    <a href="routes.html"><i class="bi bi-signpost-split"></i> Routes</a>
+    <a href="servicehistory.html"><i class="bi bi-tools"></i> Service History</a>
+    <div class="nav-label">Analytics</div>
+    <a href="reports.html"><i class="bi bi-bar-chart-line"></i> Reports</a>
+    <div class="nav-label">Chapter 4</div>
+    <a href="normalization.html" class="active"><i class="bi bi-diagram-3"></i> Normalization</a>
+  </nav>
+  <div class="sidebar-footer">logistics_db &nbsp;|&nbsp; MySQL</div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <h4><i class="bi bi-diagram-3 me-2"></i>Chapter 4 — Normalization</h4>
+    <span class="topbar-badge">1NF → 2NF → 3NF → BCNF → 4NF → 5NF</span>
+  </div>
+
+  <div class="content">
+
+    <!-- Summary banner -->
+    <div class="summary-banner">
+      <div class="sb-card">
+        <div class="nf-name" style="color:var(--cyan)">1NF</div>
+        <div class="nf-status">✓ Applied</div>
+        <div class="nf-desc">Atomic values, no repeating groups</div>
+      </div>
+      <div class="sb-card">
+        <div class="nf-name" style="color:var(--green)">2NF</div>
+        <div class="nf-status">✓ Applied</div>
+        <div class="nf-desc">No partial dependencies</div>
+      </div>
+      <div class="sb-card">
+        <div class="nf-name" style="color:var(--amber)">3NF</div>
+        <div class="nf-status">✓ Applied</div>
+        <div class="nf-desc">No transitive dependencies</div>
+      </div>
+      <div class="sb-card">
+        <div class="nf-name" style="color:var(--accent2)">BCNF</div>
+        <div class="nf-status">✓ Applied</div>
+        <div class="nf-desc">Every determinant is a candidate key</div>
+      </div>
+      <div class="sb-card">
+        <div class="nf-name" style="color:var(--accent)">4NF</div>
+        <div class="nf-status">✓ Applied</div>
+        <div class="nf-desc">No multi-valued dependencies</div>
+      </div>
+      <div class="sb-card">
+        <div class="nf-name" style="color:var(--cyan)">5NF</div>
+        <div class="nf-status">✓ Applied</div>
+        <div class="nf-desc">No join dependencies</div>
+      </div>
+    </div>
+
+    <!-- NF tabs -->
+    <div class="nf-tabs">
+      <button class="nf-tab active" onclick="showNF('1nf')">1NF — First Normal Form</button>
+      <button class="nf-tab" onclick="showNF('2nf')">2NF — Second Normal Form</button>
+      <button class="nf-tab" onclick="showNF('3nf')">3NF — Third Normal Form</button>
+      <button class="nf-tab" onclick="showNF('bcnf')">BCNF</button>
+      <button class="nf-tab" onclick="showNF('4nf')">4NF — Fourth Normal Form</button>
+      <button class="nf-tab" onclick="showNF('5nf')">5NF — Fifth Normal Form</button>
+    </div>
+
+    <!-- ══════════════════════════════════
+         1NF
+    ══════════════════════════════════ -->
+    <div id="sec-1nf" class="nf-section active">
+
+      <div class="card">
+        <div class="card-header">
+          <h6>4.1 — Pitfall Analysis</h6>
+          <span class="tag tag-pitfall">PITFALL</span>
+        </div>
+        <div class="card-body">
+          <div class="info-box">
+            Before normalization, a naive <strong>Logistics_Raw</strong> table was designed with
+            all information crammed into a single unnormalized relation. This table violates 1NF
+            because it contains <strong>multi-valued attributes</strong> (multiple phone numbers
+            in one cell), <strong>repeating groups</strong> (multiple vehicles per driver row),
+            and <strong>non-atomic values</strong> (comma-separated lists).
+          </div>
+
+          <div class="sec-heading">Unnormalized Table — Logistics_Raw (Before 1NF)</div>
+          <table class="dt">
+            <thead>
+              <tr>
+                <th>Driver_id</th><th>Driver_Name</th><th>Phone_Numbers</th>
+                <th>Vehicle_Types</th><th>Order_IDs</th><th>Locations</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="pk">201</td><td>Ramesh Kumar</td>
+                <td class="bad">9876543210, 9876543211</td>
+                <td class="bad">Truck, Van</td>
+                <td class="bad">5001, 5002</td>
+                <td class="bad">Chennai, Mumbai</td>
+              </tr>
+              <tr>
+                <td class="pk">202</td><td>Suresh Patel</td>
+                <td class="bad">9123456789</td>
+                <td class="bad">Van, Bike</td>
+                <td class="bad">5003</td>
+                <td class="bad">Delhi</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div style="margin-top:14px">
+            <div class="sec-heading">Violations Identified</div>
+            <ul class="rule-list">
+              <li><strong>Phone_Numbers</strong> contains multiple values separated by commas — not atomic</li>
+              <li><strong>Vehicle_Types</strong> is a repeating group — multiple vehicles per driver row</li>
+              <li><strong>Order_IDs</strong> is a comma-separated list — violates atomicity rule</li>
+              <li><strong>Locations</strong> contains multiple city names in one cell — not atomic</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h6>4.2.1 — Identify Dependencies</h6>
+          <span class="tag tag-1nf">1NF</span>
+        </div>
+        <div class="card-body">
+          <div class="info-box">
+            <strong>1NF Rule:</strong> Every column must contain atomic (indivisible) values.
+            Each row must be unique. No repeating groups or arrays are allowed.
+            A table is in 1NF if and only if every attribute contains only single, atomic values.
+          </div>
+          <div class="dep-row">
+            <span class="dep-key">Driver_id</span>
+            <span class="dep-arrow">→</span>
+            <span class="dep-val">Driver_Name, Phone_no (single value only)</span>
+            <span class="dep-note tag tag-ok">ATOMIC</span>
+          </div>
+          <div class="dep-row">
+            <span class="dep-key">Vehicle_Id</span>
+            <span class="dep-arrow">→</span>
+            <span class="dep-val">Plate_Number, Vehicle_Type, Capacity, Availability_Status</span>
+            <span class="dep-note tag tag-ok">ATOMIC</span>
+          </div>
+          <div class="dep-row">
+            <span class="dep-key">Location_id</span>
+            <span class="dep-arrow">→</span>
+            <span class="dep-val">Address (single city), Contact_No (single number)</span>
+            <span class="dep-note tag tag-ok">ATOMIC</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h6>4.2.2 — Apply 1NF</h6>
+          <span class="tag tag-1nf">AFTER 1NF</span>
+        </div>
+        <div class="card-body">
+          <div class="info-box">
+            After applying 1NF, every multi-valued attribute is split into separate tables.
+            Each table has a primary key and all attributes are atomic. The repeating groups
+            (vehicles, orders, locations per driver) are moved to their own tables linked by
+            foreign keys.
+          </div>
+
+          <div class="ba-grid">
+            <div>
+              <div class="ba-label before">✗ Before 1NF — Logistics_Raw</div>
+              <table class="dt">
+                <thead><tr><th>Driver_id</th><th>Name</th><th>Phone_Numbers</th><th>Vehicle_Types</th></tr></thead>
+                <tbody>
+                  <tr><td class="pk">201</td><td>Ramesh</td><td class="bad">9876..., 9876...</td><td class="bad">Truck, Van</td></tr>
+                  <tr><td class="pk">202</td><td>Suresh</td><td class="bad">9123...</td><td class="bad">Van, Bike</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div>
+              <div class="ba-label after">✓ After 1NF — Separate Atomic Tables</div>
+              <table class="dt">
+                <thead><tr><th>Driver_id (PK)</th><th>Name</th><th>Phone_no</th><th>License_Number</th></tr></thead>
+                <tbody>
+                  <tr><td class="pk">201</td><td>Ramesh Kumar</td><td class="good">9876543210</td><td>TN12345</td></tr>
+                  <tr><td class="pk">202</td><td>Suresh Patel</td><td class="good">9123456789</td><td>MH54321</td></tr>
+                  <tr><td class="pk">203</td><td>Amit Singh</td><td class="good">9988776655</td><td>DL67890</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div style="margin-top:16px">
+            <div class="ba-label after" style="margin-bottom:8px">✓ After 1NF — Vehicle Table (separate from Driver)</div>
+            <table class="dt">
+              <thead><tr><th>Vehicle_Id (PK)</th><th>Plate_Number</th><th>Vehicle_Type</th><th>Capacity</th><th>Availability_Status</th></tr></thead>
+              <tbody>
+                <tr><td class="pk">301</td><td>TN09AB1234</td><td>Truck</td><td>1000</td><td class="good">Available</td></tr>
+                <tr><td class="pk">302</td><td>MH12CD5678</td><td>Van</td><td>700</td><td class="good">In Service</td></tr>
+                <tr><td class="pk">303</td><td>DL05EF9012</td><td>Bike</td><td>50</td><td class="good">Available</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div style="margin-top:12px">
+            <div class="info-box">
+              <strong>Result:</strong> All 8 tables (Driver, Vehicle, Orders, Delivery, Assignment,
+              Location, Route, Service_History) satisfy 1NF — every attribute holds exactly one
+              atomic value, every row is uniquely identified by its primary key, and there are no
+              repeating groups anywhere.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         2NF
+    ══════════════════════════════════ -->
+    <div id="sec-2nf" class="nf-section">
+      <div class="card">
+        <div class="card-header">
+          <h6>4.3.1 — Identify Partial Dependencies</h6>
+          <span class="tag tag-2nf">2NF</span>
+        </div>
+        <div class="card-body">
+          <div class="info-box">
+            <strong>2NF Rule:</strong> A table is in 2NF if it is in 1NF AND every non-key
+            attribute is <strong>fully functionally dependent</strong> on the entire primary key.
+            Partial dependency occurs only when a composite primary key exists — a non-key
+            attribute depends on only part of the composite key.
+          </div>
+
+          <div class="sec-heading">Analysis — Assignment Table (Composite Key Risk)</div>
+          <div class="info-box">
+            The <strong>Assignment</strong> table was initially designed with a composite key
+            <strong>(Delivery_id, Driver_id)</strong> before Assignment_id was introduced as
+            a surrogate key. In that design, Start_time depended only on Delivery_id (partial
+            dependency). After introducing <strong>Assignment_id</strong> as the sole primary
+            key, this partial dependency is eliminated.
+          </div>
+
+          <div class="dep-row">
+            <span class="dep-key">(Delivery_id, Driver_id)</span>
+            <span class="dep-arrow">→</span>
+            <span class="dep-val">Vehicle_id, Start_time</span>
+            <span class="dep-note tag tag-violation">PARTIAL DEP (old design)</span>
+          </div>
+          <div class="dep-row">
+            <span class="dep-key">Delivery_id</span>
+            <span class="dep-arrow">→</span>
+            <span class="dep-val">Start_time</span>
+            <span class="dep-note tag tag-violation">PARTIAL DEP (old design)</span>
+          </div>
+          <div class="dep-row">
+            <span class="dep-key">Assignment_id (PK)</span>
+            <span class="dep-arrow">→</span>
+            <span class="dep-val">Delivery_id, Driver_id, Vehicle_id, Start_time</span>
+            <span class="dep-note tag tag-ok">FULL DEP (current design)</span>
+          </div>
+
+          <div class="sec-heading">All Tables — Full Dependency Check</div>
+
+          <div class="dep-row">
+            <span class="dep-key">Driver_id</span>
+            <span class="dep-arrow">→</span>
+            <span class="dep-val">Name, Phone_no, License_Number</span>
+            <span class="dep-note tag tag-ok">FULL DEP ✓</span>
+          </div>
+          <div class="dep-row">
+            <span class="dep-key">Vehicle_Id</span>
+            <span class="dep-arrow">→</span>
+            <span class="dep-val">Plate_Number, Vehicle_Type, Capacity, Availability_Status</span>
+            <span class="dep-note tag tag-ok">FULL DEP ✓</span>
+          </div>
+          <div class="dep-row">
+            <span class="dep-key">Order_Id</span>
+            <span class="dep-arrow">→</span>
+            <span class="dep-val">Oder_Date, Customer_Id</span>
+            <span class="dep-note tag tag-ok">FULL DEP ✓</span>
+          </div>
+          <div class="dep-row">
+            <span class="dep-key">Deliver_id</span>
+            <span class="dep-arrow">→</span>
+            <span class="dep-val">Order_id, Assignment_time, Completed_time</span>
+            <span class="dep-note tag tag-ok">FULL DEP ✓</span>
+          </div>
+          <div class="dep-row">
+            <span class="dep-key">Location_id</span>
+            <span class="dep-arrow">→</span>
+            <span class="dep-val">Address, Contact_No</span>
+            <span class="dep-note tag tag-ok">FULL DEP ✓</span>
+          </div>
+          <div class="dep-row">
+            <span class="dep-key">Route_id</span>
+            <span class="dep-arrow">→</span>
+            <span class="dep-val">Distance</span>
+            <span class="dep-note tag tag-ok">FULL DEP ✓</span>
+          </div>
+          <div class="dep-row">
+            <span class="dep-key">Record_id</span>
+            <span class="dep-arrow">→</span>
+            <span class="dep-val">Vehicle_id, Maintenance_Type, Service_Date</span>
+            <span class="dep-note tag tag-ok">FULL DEP ✓</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h6>4.3.2 — Apply 2NF</h6>
+          <span class="tag tag-2nf">AFTER 2NF</span>
+        </div>
+        <div class="card-body">
+          <div class="ba-grid">
+            <div>
+              <div class="ba-label before">✗ Before 2NF — Assignment (composite key)</div>
+              <table class="dt">
+                <thead><tr><th>Delivery_id (PK)</th><th>Driver_id (PK)</th><th>Vehicle_id</th><th>Start_time</th></tr></thead>
+                <tbody>
+                  <tr><td class="pk">1001</td><td class="pk">201</td><td>301</td><td class="bad">depends on Delivery_id only</td></tr>
+                  <tr><td class="pk">1002</td><td class="pk">202</td><td>302</td><td class="bad">depends on Delivery_id only</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div>
+              <div class="ba-label after">✓ After 2NF — Assignment (surrogate key)</div>
+              <table class="dt">
+                <thead><tr><th>Assignment_id (PK)</th><th>Delivery_id (FK)</th><th>Driver_id (FK)</th><th>Vehicle_id (FK)</th><th>Start_time</th></tr></thead>
+                <tbody>
+                  <tr><td class="pk">1</td><td class="fk">1001</td><td class="fk">201</td><td class="fk">301</td><td class="good">2024-03-01 09:00</td></tr>
+                  <tr><td class="pk">2</td><td class="fk">1002</td><td class="fk">202</td><td class="fk">302</td><td class="good">2024-03-02 10:30</td></tr>
+                  <tr><td class="pk">3</td><td class="fk">1003</td><td class="fk">203</td><td class="fk">303</td><td class="good">2024-03-03 12:00</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div style="margin-top:12px">
+            <div class="info-box">
+              <strong>Result:</strong> By introducing surrogate primary keys (Assignment_id,
+              Deliver_id, Record_id etc.) for all tables, every non-key attribute is fully
+              functionally dependent on its respective single-column primary key.
+              All 8 tables satisfy 2NF.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         3NF
+    ══════════════════════════════════ -->
+    <div id="sec-3nf" class="nf-section">
+      <div class="card">
+        <div class="card-header">
+          <h6>4.4.1 — Identify Transitive Dependencies</h6>
+          <span class="tag tag-3nf">3NF</span>
+        </div>
+        <div class="card-body">
+          <div class="info-box">
+            <strong>3NF Rule:</strong> A table is in 3NF if it is in 2NF AND no non-key attribute
+            is transitively dependent on the primary key. A transitive dependency occurs when:
+            <strong>A → B → C</strong> (where A is the PK, B is a non-key attribute that
+            determines C, another non-key attribute).
+          </div>
+
+          <div class="sec-heading">Transitive Dependency Analysis — Orders Table</div>
+          <div class="info-box">
+            A potential transitive dependency was identified: if Customer_Id in the Orders table
+            stored customer details like Customer_Name and Customer_Address directly, then:
+            <strong>Order_Id → Customer_Id → Customer_Name</strong> (transitive).
+            This was resolved by keeping only Customer_Id in Orders and not embedding
+            customer details inside the Orders table.
+          </div>
+
+          <div class="dep-row">
+            <span class="dep-key">Order_Id</span>
+            <span class="dep-arrow">→</span>
+            <span class="dep-val">Customer_Id</span>
+            <span class="dep-arrow">→</span>
+            <span class="dep-val">Customer_Name (hypothetical)</span>
+            <span class="dep-note tag tag-violation">TRANSITIVE (avoided)</span>
+          </div>
+          <div class="dep-row">
+            <span class="dep-key">Order_Id</span>
+            <span class="dep-arrow">→</span>
+            <span class="dep-val">Oder_Date, Customer_Id (reference only)</span>
+            <span class="dep-note tag tag-ok">3NF COMPLIANT ✓</span>
+          </div>
+
+          <div class="sec-heading">Transitive Dependency Analysis — Service_History Table</div>
+          <div class="info-box">
+            Another potential case: if Vehicle_Type were stored directly in Service_History
+            instead of referencing Vehicle_id, then:
+            <strong>Record_id → Vehicle_Type → Capacity</strong> (transitive).
+            By storing only Vehicle_id (FK) and fetching type/capacity from the Vehicle
+            table via JOIN, this transitive dependency is eliminated.
+          </div>
+
+          <div class="dep-row">
+            <span class="dep-key">Record_id</span>
+            <span class="dep-arrow">→</span>
+            <span class="dep-val">Vehicle_Type → Capacity</span>
+            <span class="dep-note tag tag-violation">TRANSITIVE (avoided)</span>
+          </div>
+          <div class="dep-row">
+            <span class="dep-key">Record_id</span>
+            <span class="dep-arrow">→</span>
+            <span class="dep-val">Vehicle_id (FK), Maintenance_Type, Service_Date</span>
+            <span class="dep-note tag tag-ok">3NF COMPLIANT ✓</span>
+          </div>
+
+          <div class="sec-heading">All Tables — Transitive Dependency Check</div>
+          <div class="dep-row"><span class="dep-key">Driver_id</span><span class="dep-arrow">→</span><span class="dep-val">Name, Phone_no, License_Number — no non-key determines another non-key</span><span class="dep-note tag tag-ok">3NF ✓</span></div>
+          <div class="dep-row"><span class="dep-key">Vehicle_Id</span><span class="dep-arrow">→</span><span class="dep-val">Plate_Number, Vehicle_Type, Capacity, Availability_Status — all independent</span><span class="dep-note tag tag-ok">3NF ✓</span></div>
+          <div class="dep-row"><span class="dep-key">Deliver_id</span><span class="dep-arrow">→</span><span class="dep-val">Order_id (FK), Assignment_time, Completed_time — no chain</span><span class="dep-note tag tag-ok">3NF ✓</span></div>
+          <div class="dep-row"><span class="dep-key">Assignment_id</span><span class="dep-arrow">→</span><span class="dep-val">Delivery_id, Driver_id, Vehicle_id (all FKs), Start_time</span><span class="dep-note tag tag-ok">3NF ✓</span></div>
+          <div class="dep-row"><span class="dep-key">Location_id</span><span class="dep-arrow">→</span><span class="dep-val">Address, Contact_No — no chain possible</span><span class="dep-note tag tag-ok">3NF ✓</span></div>
+          <div class="dep-row"><span class="dep-key">Route_id</span><span class="dep-arrow">→</span><span class="dep-val">Distance — single attribute, no chain possible</span><span class="dep-note tag tag-ok">3NF ✓</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h6>4.4.2 — Apply 3NF</h6>
+          <span class="tag tag-3nf">AFTER 3NF</span>
+        </div>
+        <div class="card-body">
+          <div class="ba-grid">
+            <div>
+              <div class="ba-label before">✗ Before 3NF — Orders with embedded customer data</div>
+              <table class="dt">
+                <thead><tr><th>Order_Id</th><th>Oder_Date</th><th>Customer_Id</th><th>Customer_Name</th><th>Customer_City</th></tr></thead>
+                <tbody>
+                  <tr><td class="pk">5001</td><td>2024-03-01</td><td>901</td><td class="bad">Ravi Kumar</td><td class="bad">Chennai</td></tr>
+                  <tr><td class="pk">5002</td><td>2024-03-02</td><td>902</td><td class="bad">Priya M</td><td class="bad">Mumbai</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div>
+              <div class="ba-label after">✓ After 3NF — Orders (clean, no transitive)</div>
+              <table class="dt">
+                <thead><tr><th>Order_Id (PK)</th><th>Oder_Date</th><th>Customer_Id (ref)</th></tr></thead>
+                <tbody>
+                  <tr><td class="pk">5001</td><td>2024-03-01</td><td class="fk good">901</td></tr>
+                  <tr><td class="pk">5002</td><td>2024-03-02</td><td class="fk good">902</td></tr>
+                  <tr><td class="pk">5003</td><td>2024-03-03</td><td class="fk good">903</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div style="margin-top:12px">
+            <div class="info-box">
+              <strong>Result:</strong> All customer-specific information is kept external to Orders.
+              No non-key attribute in any of our 8 tables transitively depends on the primary key.
+              All 8 tables satisfy 3NF.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         BCNF
+    ══════════════════════════════════ -->
+    <div id="sec-bcnf" class="nf-section">
+      <div class="card">
+        <div class="card-header">
+          <h6>4.5.1 — Identify BCNF Violations</h6>
+          <span class="tag tag-bcnf">BCNF</span>
+        </div>
+        <div class="card-body">
+          <div class="info-box">
+            <strong>BCNF Rule (Boyce-Codd Normal Form):</strong> A table is in BCNF if for every
+            functional dependency <strong>X → Y</strong>, X must be a superkey (candidate key).
+            BCNF is a stronger version of 3NF. A table can be in 3NF but still violate BCNF
+            if a non-superkey attribute determines another attribute.
+          </div>
+
+          <div class="sec-heading">BCNF Analysis — Driver Table</div>
+          <div class="dep-row">
+            <span class="dep-key">Driver_id (PK / superkey)</span>
+            <span class="dep-arrow">→</span>
+            <span class="dep-val">Name, Phone_no, License_Number</span>
+            <span class="dep-note tag tag-ok">BCNF ✓</span>
+          </div>
+          <div class="dep-row">
+            <span class="dep-key">License_Number (candidate key)</span>
+            <span class="dep-arrow">→</span>
+            <span class="dep-val">Driver_id, Name, Phone_no</span>
+            <span class="dep-note tag tag-ok">BCNF ✓ (License is also a superkey)</span>
+          </div>
+
+          <div class="sec-heading">BCNF Analysis — Vehicle Table</div>
+          <div class="dep-row">
+            <span class="dep-key">Vehicle_Id (PK)</span>
+            <span class="dep-arrow">→</span>
+            <span class="dep-val">Plate_Number, Vehicle_Type, Capacity, Availability_Status</span>
+            <span class="dep-note tag tag-ok">BCNF ✓</span>
+          </div>
+          <div class="dep-row">
+            <span class="dep-key">Plate_Number (candidate key)</span>
+            <span class="dep-arrow">→</span>
+            <span class="dep-val">Vehicle_Id, Vehicle_Type, Capacity</span>
+            <span class="dep-note tag tag-ok">BCNF ✓ (Plate is also a superkey)</span>
+          </div>
+
+          <div class="sec-heading">BCNF Analysis — Assignment Table</div>
+          <div class="dep-row">
+            <span class="dep-key">Assignment_id (PK / superkey)</span>
+            <span class="dep-arrow">→</span>
+            <span class="dep-val">Delivery_id, Driver_id, Vehicle_id, Start_time</span>
+            <span class="dep-note tag tag-ok">BCNF ✓</span>
+          </div>
+          <div class="dep-row">
+            <span class="dep-key">Driver_id (non-superkey)</span>
+            <span class="dep-arrow">→</span>
+            <span class="dep-val">Vehicle_id? — NO, a driver can use different vehicles</span>
+            <span class="dep-note tag tag-ok">No violation ✓</span>
+          </div>
+
+          <div class="sec-heading">BCNF Analysis — All Remaining Tables</div>
+          <div class="dep-row"><span class="dep-key">Order_Id</span><span class="dep-arrow">→</span><span class="dep-val">Oder_Date, Customer_Id — PK is the only determinant</span><span class="dep-note tag tag-ok">BCNF ✓</span></div>
+          <div class="dep-row"><span class="dep-key">Deliver_id</span><span class="dep-arrow">→</span><span class="dep-val">Order_id, Assignment_time, Completed_time</span><span class="dep-note tag tag-ok">BCNF ✓</span></div>
+          <div class="dep-row"><span class="dep-key">Location_id</span><span class="dep-arrow">→</span><span class="dep-val">Address, Contact_No</span><span class="dep-note tag tag-ok">BCNF ✓</span></div>
+          <div class="dep-row"><span class="dep-key">Route_id</span><span class="dep-arrow">→</span><span class="dep-val">Distance</span><span class="dep-note tag tag-ok">BCNF ✓</span></div>
+          <div class="dep-row"><span class="dep-key">Record_id</span><span class="dep-arrow">→</span><span class="dep-val">Vehicle_id, Maintenance_Type, Service_Date</span><span class="dep-note tag tag-ok">BCNF ✓</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h6>4.5.2 — Apply BCNF</h6>
+          <span class="tag tag-bcnf">AFTER BCNF</span>
+        </div>
+        <div class="card-body">
+          <div class="info-box">
+            All 8 tables in the Logistics & Delivery Operations Management System already satisfy
+            BCNF. For every functional dependency X → Y in each table, X is a superkey
+            (either the primary key or a candidate key like License_Number or Plate_Number).
+            No decomposition was required.
+          </div>
+
+          <div class="ba-label after" style="margin-bottom:10px">✓ BCNF Verification — Driver Table</div>
+          <table class="dt">
+            <thead><tr><th>Determinant</th><th>Dependent Attributes</th><th>Is Superkey?</th><th>BCNF Status</th></tr></thead>
+            <tbody>
+              <tr><td class="pk">Driver_id</td><td>Name, Phone_no, License_Number</td><td class="good">Yes (PK)</td><td class="good">✓ BCNF</td></tr>
+              <tr><td class="pk">License_Number</td><td>Driver_id, Name, Phone_no</td><td class="good">Yes (Candidate Key)</td><td class="good">✓ BCNF</td></tr>
+            </tbody>
+          </table>
+
+          <div style="margin-top:14px">
+            <div class="ba-label after" style="margin-bottom:10px">✓ BCNF Verification — Vehicle Table</div>
+            <table class="dt">
+              <thead><tr><th>Determinant</th><th>Dependent Attributes</th><th>Is Superkey?</th><th>BCNF Status</th></tr></thead>
+              <tbody>
+                <tr><td class="pk">Vehicle_Id</td><td>Plate_Number, Vehicle_Type, Capacity, Availability_Status</td><td class="good">Yes (PK)</td><td class="good">✓ BCNF</td></tr>
+                <tr><td class="pk">Plate_Number</td><td>Vehicle_Id, Vehicle_Type, Capacity</td><td class="good">Yes (Candidate Key)</td><td class="good">✓ BCNF</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         4NF
+    ══════════════════════════════════ -->
+    <div id="sec-4nf" class="nf-section">
+      <div class="card">
+        <div class="card-header">
+          <h6>4.6.1 — Identify Multi-Valued Dependencies</h6>
+          <span class="tag tag-4nf">4NF</span>
+        </div>
+        <div class="card-body">
+          <div class="info-box">
+            <strong>4NF Rule:</strong> A table is in 4NF if it is in BCNF AND has no
+            non-trivial multi-valued dependencies. A multi-valued dependency (MVD) exists when
+            one attribute in a table uniquely determines multiple independent sets of values of
+            another attribute. Notation: <strong>A ↠ B</strong> (A multi-determines B).
+          </div>
+
+          <div class="sec-heading">Multi-Valued Dependency Analysis — Assignment Table</div>
+          <div class="info-box">
+            A potential MVD scenario: if a driver could be assigned to multiple vehicles
+            independently of deliveries, we would have:
+            <strong>Driver_id ↠ Vehicle_id</strong> and
+            <strong>Driver_id ↠ Delivery_id</strong> independently.
+            This was resolved by the Assignment table structure where Driver, Vehicle and
+            Delivery are all linked together in a single assignment record — they are
+            not independent multi-valued facts.
+          </div>
+
+          <div class="dep-row">
+            <span class="dep-key">Driver_id ↠ Vehicle_id</span>
+            <span class="dep-arrow">AND</span>
+            <span class="dep-key">Driver_id ↠ Delivery_id</span>
+            <span class="dep-note tag tag-violation">MVD RISK (avoided)</span>
+          </div>
+          <div class="dep-row">
+            <span class="dep-key">Assignment_id</span>
+            <span class="dep-arrow">→</span>
+            <span class="dep-val">Driver_id + Vehicle_id + Delivery_id (all linked together)</span>
+            <span class="dep-note tag tag-ok">4NF ✓ (no independent MVD)</span>
+          </div>
+
+          <div class="sec-heading">Multi-Valued Dependency Analysis — Service_History Table</div>
+          <div class="info-box">
+            If a vehicle could have multiple independent maintenance types AND multiple
+            independent service dates (not linked to each other), that would be an MVD:
+            <strong>Vehicle_id ↠ Maintenance_Type</strong> and
+            <strong>Vehicle_id ↠ Service_Date</strong> independently.
+            In our design, each Service_History record has a specific (Maintenance_Type, Service_Date)
+            pair — they are co-dependent, not independent. No MVD exists.
+          </div>
+
+          <div class="dep-row">
+            <span class="dep-key">Vehicle_id ↠ Maintenance_Type</span>
+            <span class="dep-arrow">AND</span>
+            <span class="dep-key">Vehicle_id ↠ Service_Date</span>
+            <span class="dep-note tag tag-violation">MVD RISK (avoided)</span>
+          </div>
+          <div class="dep-row">
+            <span class="dep-key">Record_id (PK)</span>
+            <span class="dep-arrow">→</span>
+            <span class="dep-val">Vehicle_id, Maintenance_Type, Service_Date (linked pair)</span>
+            <span class="dep-note tag tag-ok">4NF ✓</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h6>4.6.2 — Apply 4NF</h6>
+          <span class="tag tag-4nf">AFTER 4NF</span>
+        </div>
+        <div class="card-body">
+          <div class="ba-grid">
+            <div>
+              <div class="ba-label before">✗ Before 4NF — Driver_Vehicle_Delivery (MVD risk)</div>
+              <table class="dt">
+                <thead><tr><th>Driver_id</th><th>Vehicle_id</th><th>Delivery_id</th></tr></thead>
+                <tbody>
+                  <tr><td class="pk">201</td><td class="bad">301</td><td class="bad">1001</td></tr>
+                  <tr><td class="pk">201</td><td class="bad">301</td><td class="bad">1002</td></tr>
+                  <tr><td class="pk">201</td><td class="bad">302</td><td class="bad">1001</td></tr>
+                  <tr><td class="pk">201</td><td class="bad">302</td><td class="bad">1002</td></tr>
+                </tbody>
+              </table>
+              <div style="margin-top:8px;font-size:11px;color:var(--muted)">Redundant rows due to MVD between Vehicle and Delivery</div>
+            </div>
+            <div>
+              <div class="ba-label after">✓ After 4NF — Assignment (single linked record)</div>
+              <table class="dt">
+                <thead><tr><th>Assignment_id (PK)</th><th>Driver_id (FK)</th><th>Vehicle_id (FK)</th><th>Delivery_id (FK)</th><th>Start_time</th></tr></thead>
+                <tbody>
+                  <tr><td class="pk">1</td><td class="fk">201</td><td class="fk">301</td><td class="fk">1001</td><td class="good">2024-03-01 09:00</td></tr>
+                  <tr><td class="pk">2</td><td class="fk">202</td><td class="fk">302</td><td class="fk">1002</td><td class="good">2024-03-02 10:30</td></tr>
+                  <tr><td class="pk">3</td><td class="fk">203</td><td class="fk">303</td><td class="fk">1003</td><td class="good">2024-03-03 12:00</td></tr>
+                </tbody>
+              </table>
+              <div style="margin-top:8px;font-size:11px;color:var(--green)">No redundant rows — all attributes co-dependent</div>
+            </div>
+          </div>
+          <div style="margin-top:12px">
+            <div class="info-box">
+              <strong>Result:</strong> By ensuring that in the Assignment table, Driver, Vehicle
+              and Delivery are always recorded together as one assignment event (not as
+              independent multi-valued facts), the 4NF requirement is satisfied.
+              All 8 tables satisfy 4NF.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         5NF
+    ══════════════════════════════════ -->
+    <div id="sec-5nf" class="nf-section">
+      <div class="card">
+        <div class="card-header">
+          <h6>4.7.1 — Identify Join Dependencies</h6>
+          <span class="tag tag-5nf">5NF</span>
+        </div>
+        <div class="card-body">
+          <div class="info-box">
+            <strong>5NF Rule (Project-Join Normal Form):</strong> A table is in 5NF if it is in
+            4NF AND every join dependency is implied by the candidate keys. A join dependency
+            means the table can only be reconstructed by joining all its projections — it
+            cannot be losslessly decomposed further. 5NF deals with cases where data can only
+            be accurately represented by the full combination of three or more attributes.
+          </div>
+
+          <div class="sec-heading">Join Dependency Analysis — Assignment Table</div>
+          <div class="info-box">
+            The most complex relation in our system is the <strong>Assignment</strong> table
+            which links Driver, Vehicle, and Delivery together. The key question for 5NF is:
+            can this table be split into binary projections (Driver↔Vehicle, Vehicle↔Delivery,
+            Driver↔Delivery) and then re-joined to get the same result without spurious tuples?
+          </div>
+
+          <div class="dep-row">
+            <span class="dep-key">Projection 1</span>
+            <span class="dep-arrow">:</span>
+            <span class="dep-val">Driver_Vehicle (Driver_id, Vehicle_id)</span>
+            <span class="dep-note tag tag-violation">LOSSY alone</span>
+          </div>
+          <div class="dep-row">
+            <span class="dep-key">Projection 2</span>
+            <span class="dep-arrow">:</span>
+            <span class="dep-val">Vehicle_Delivery (Vehicle_id, Delivery_id)</span>
+            <span class="dep-note tag tag-violation">LOSSY alone</span>
+          </div>
+          <div class="dep-row">
+            <span class="dep-key">Projection 3</span>
+            <span class="dep-arrow">:</span>
+            <span class="dep-val">Driver_Delivery (Driver_id, Delivery_id)</span>
+            <span class="dep-note tag tag-violation">LOSSY alone</span>
+          </div>
+          <div class="dep-row">
+            <span class="dep-key">Join Dependency</span>
+            <span class="dep-arrow">:</span>
+            <span class="dep-val">* {Driver_id, Vehicle_id, Delivery_id} — must be stored together</span>
+            <span class="dep-note tag tag-ok">5NF ✓ (implied by PK)</span>
+          </div>
+
+          <div class="sec-heading">5NF Lossless Decomposition Test — Assignment</div>
+          <table class="dt">
+            <thead><tr><th>Test</th><th>Decomposition</th><th>Join Result</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Binary split</td>
+                <td class="bad">Driver↔Vehicle + Vehicle↔Delivery</td>
+                <td class="bad">Spurious tuples generated</td>
+                <td class="bad">LOSSY ✗</td>
+              </tr>
+              <tr>
+                <td>Full table</td>
+                <td class="good">Assignment_id + Driver + Vehicle + Delivery + Start_time</td>
+                <td class="good">Exact original table restored</td>
+                <td class="good">LOSSLESS ✓</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="sec-heading">5NF Analysis — All Tables</div>
+          <div class="dep-row"><span class="dep-key">Driver</span><span class="dep-val">Single-entity table — no join dependency possible</span><span class="dep-note tag tag-ok">5NF ✓</span></div>
+          <div class="dep-row"><span class="dep-key">Vehicle</span><span class="dep-val">Single-entity table — no join dependency possible</span><span class="dep-note tag tag-ok">5NF ✓</span></div>
+          <div class="dep-row"><span class="dep-key">Orders</span><span class="dep-val">Only 3 attributes — cannot be decomposed further losslessly</span><span class="dep-note tag tag-ok">5NF ✓</span></div>
+          <div class="dep-row"><span class="dep-key">Delivery</span><span class="dep-val">Links Order to time data — join dependency implied by Deliver_id PK</span><span class="dep-note tag tag-ok">5NF ✓</span></div>
+          <div class="dep-row"><span class="dep-key">Assignment</span><span class="dep-val">3-way join (Driver+Vehicle+Delivery) implied by Assignment_id PK</span><span class="dep-note tag tag-ok">5NF ✓</span></div>
+          <div class="dep-row"><span class="dep-key">Location</span><span class="dep-val">2 attributes + PK — trivially in 5NF</span><span class="dep-note tag tag-ok">5NF ✓</span></div>
+          <div class="dep-row"><span class="dep-key">Route</span><span class="dep-val">1 attribute + PK — trivially in 5NF</span><span class="dep-note tag tag-ok">5NF ✓</span></div>
+          <div class="dep-row"><span class="dep-key">Service_History</span><span class="dep-val">Links Vehicle to maintenance event — implied by Record_id PK</span><span class="dep-note tag tag-ok">5NF ✓</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h6>4.7.2 — Apply 5NF</h6>
+          <span class="tag tag-5nf">AFTER 5NF</span>
+        </div>
+        <div class="card-body">
+          <div class="ba-grid">
+            <div>
+              <div class="ba-label before">✗ Attempted Decomposition — LOSSY</div>
+              <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Splitting Assignment into binary projections generates spurious rows when re-joined</div>
+              <table class="dt">
+                <thead><tr><th>Driver_id</th><th>Vehicle_id</th></tr></thead>
+                <tbody>
+                  <tr><td class="pk">201</td><td class="bad">301</td></tr>
+                  <tr><td class="pk">202</td><td class="bad">302</td></tr>
+                </tbody>
+              </table>
+              <div class="arrow-down">⊕</div>
+              <table class="dt">
+                <thead><tr><th>Vehicle_id</th><th>Delivery_id</th></tr></thead>
+                <tbody>
+                  <tr><td class="pk">301</td><td class="bad">1001</td></tr>
+                  <tr><td class="pk">302</td><td class="bad">1002</td></tr>
+                </tbody>
+              </table>
+              <div style="margin-top:8px;font-size:11px;color:var(--red)">Re-join produces spurious tuple: (201, 302, 1002) — WRONG</div>
+            </div>
+            <div>
+              <div class="ba-label after">✓ 5NF — Assignment kept as one table</div>
+              <div style="font-size:12px;color:var(--muted);margin-bottom:8px">The full Assignment table is the minimal lossless representation</div>
+              <table class="dt">
+                <thead><tr><th>Assignment_id</th><th>Driver_id</th><th>Vehicle_id</th><th>Delivery_id</th><th>Start_time</th></tr></thead>
+                <tbody>
+                  <tr><td class="pk">1</td><td class="fk">201</td><td class="fk">301</td><td class="fk">1001</td><td class="good">09:00</td></tr>
+                  <tr><td class="pk">2</td><td class="fk">202</td><td class="fk">302</td><td class="fk">1002</td><td class="good">10:30</td></tr>
+                  <tr><td class="pk">3</td><td class="fk">203</td><td class="fk">303</td><td class="fk">1003</td><td class="good">12:00</td></tr>
+                </tbody>
+              </table>
+              <div style="margin-top:8px;font-size:11px;color:var(--green)">Lossless — every join dependency is implied by Assignment_id PK</div>
+            </div>
+          </div>
+
+          <div style="margin-top:16px">
+            <div class="info-box">
+              <strong>Final Result — All Normal Forms Satisfied:</strong>
+              The Logistics & Delivery Operations Management System database satisfies all six
+              normal forms (1NF through 5NF). The design uses surrogate primary keys to eliminate
+              partial dependencies, separates entities into their own tables to remove transitive
+              dependencies, links multi-entity facts through the Assignment table to prevent
+              multi-valued dependency violations, and stores all complex relationships as single
+              lossless records to satisfy the join dependency requirement of 5NF.
+            </div>
+
+            <table class="dt" style="margin-top:16px">
+              <thead><tr><th>Normal Form</th><th>Rule</th><th>Applied To</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td style="color:var(--cyan)">1NF</td><td>Atomic values, no repeating groups</td><td>All 8 tables — separate entity tables</td><td class="good">✓ Satisfied</td></tr>
+                <tr><td style="color:var(--green)">2NF</td><td>No partial dependencies</td><td>Assignment — surrogate key Assignment_id</td><td class="good">✓ Satisfied</td></tr>
+                <tr><td style="color:var(--amber)">3NF</td><td>No transitive dependencies</td><td>Orders — Customer_Id kept as reference only</td><td class="good">✓ Satisfied</td></tr>
+                <tr><td style="color:var(--accent2)">BCNF</td><td>Every determinant is a superkey</td><td>All tables — PKs and candidate keys verified</td><td class="good">✓ Satisfied</td></tr>
+                <tr><td style="color:var(--accent)">4NF</td><td>No multi-valued dependencies</td><td>Assignment — Driver+Vehicle+Delivery co-linked</td><td class="good">✓ Satisfied</td></tr>
+                <tr><td style="color:var(--cyan)">5NF</td><td>No non-trivial join dependencies</td><td>Assignment — lossless, implied by PK</td><td class="good">✓ Satisfied</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function showNF(id) {
+    document.querySelectorAll('.nf-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nf-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('sec-' + id).classList.add('active');
+    event.target.classList.add('active');
+  }
+</script>
+</body>
+</html>

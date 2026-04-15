@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Deliveries — LogiOps</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',sans-serif;background:#f0f2f5;display:flex;min-height:100vh}
+    .sidebar{width:240px;min-height:100vh;background:#1a1f36;color:#fff;display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100}
+    .sidebar-brand{padding:20px 16px;border-bottom:1px solid #2e3457}
+    .sidebar-brand h5{font-size:13px;font-weight:700;color:#7c83fd;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
+    .sidebar-brand p{font-size:11px;color:#8892b0;margin:0}
+    .sidebar-nav{padding:12px 0;flex:1}
+    .nav-section-label{font-size:10px;font-weight:700;color:#4a5568;letter-spacing:1.5px;text-transform:uppercase;padding:14px 20px 6px}
+    .sidebar-nav a{display:flex;align-items:center;gap:10px;padding:10px 20px;color:#a0aec0;text-decoration:none;font-size:13.5px;transition:all .2s;border-left:3px solid transparent}
+    .sidebar-nav a:hover,.sidebar-nav a.active{background:#252b4a;color:#fff;border-left-color:#7c83fd}
+    .sidebar-nav a i{font-size:16px;width:20px}
+    .sidebar-footer{padding:14px 20px;font-size:11px;color:#4a5568;border-top:1px solid #2e3457}
+    .main{margin-left:240px;flex:1;display:flex;flex-direction:column}
+    .topbar{background:#fff;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:50}
+    .topbar h4{font-size:16px;font-weight:700;color:#1a1f36;margin:0}
+    .content{padding:28px}
+    .panel{background:#fff;border-radius:12px;border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:24px;overflow:hidden}
+    .panel-header{padding:16px 20px;border-bottom:1px solid #f0f2f5;display:flex;align-items:center;justify-content:space-between}
+    .panel-header h6{font-size:14px;font-weight:700;color:#1a1f36;margin:0}
+    .data-table{width:100%;border-collapse:collapse;font-size:13px}
+    .data-table th{background:#f7f8fc;padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #e2e8f0}
+    .data-table td{padding:11px 14px;border-bottom:1px solid #f0f2f5;color:#2d3748}
+    .data-table tr:last-child td{border-bottom:none}
+    .data-table tr:hover td{background:#f7f8fc}
+    .btn-add{background:#7c83fd;color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px}
+    .btn-edit{background:#dbeafe;color:#1d4ed8;border:none;padding:4px 10px;border-radius:6px;font-size:12px;cursor:pointer}
+    .btn-delete{background:#fee2e2;color:#dc2626;border:none;padding:4px 10px;border-radius:6px;font-size:12px;cursor:pointer;margin-left:4px}
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;align-items:center;justify-content:center}
+    .modal-overlay.open{display:flex}
+    .modal-box{background:#fff;border-radius:14px;width:460px;padding:28px;box-shadow:0 8px 32px rgba(0,0,0,.15)}
+    .modal-box h5{font-size:15px;font-weight:700;color:#1a1f36;margin-bottom:20px}
+    .form-group{margin-bottom:14px}
+    .form-group label{font-size:12px;font-weight:600;color:#4a5568;display:block;margin-bottom:5px}
+    .form-group input{width:100%;padding:9px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none}
+    .form-group input:focus{border-color:#7c83fd}
+    .modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+    .btn-cancel{background:#f7f8fc;color:#4a5568;border:1px solid #e2e8f0;padding:8px 18px;border-radius:8px;font-size:13px;cursor:pointer}
+    .btn-save{background:#7c83fd;color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:13px;cursor:pointer}
+    .toast{position:fixed;bottom:24px;right:24px;background:#1a1f36;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;z-index:999;display:none}
+    .spinner{display:inline-block;width:18px;height:18px;border:2px solid #e2e8f0;border-top-color:#7c83fd;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .duration-pill{background:#f0fdf4;color:#15803d;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+  </style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-brand"><h5>&#9650; LogiOps</h5><p>Delivery Management System</p></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <a href="../index.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <div class="nav-section-label">Manage</div>
+    <a href="drivers.html"><i class="bi bi-person-badge"></i> Drivers</a>
+    <a href="vehicles.html"><i class="bi bi-truck"></i> Vehicles</a>
+    <a href="orders.html"><i class="bi bi-box-seam"></i> Orders</a>
+    <a href="deliveries.html" class="active"><i class="bi bi-send"></i> Deliveries</a>
+    <a href="assignments.html"><i class="bi bi-clipboard-check"></i> Assignments</a>
+    <a href="locations.html"><i class="bi bi-geo-alt"></i> Locations</a>
+    <a href="routes.html"><i class="bi bi-signpost-split"></i> Routes</a>
+    <a href="servicehistory.html"><i class="bi bi-tools"></i> Service History</a>
+    <div class="nav-section-label">Analytics</div>
+    <a href="reports.html"><i class="bi bi-bar-chart-line"></i> Reports</a>
+    <div class="nav-label" style="font-size:10px;font-weight:700;color:#4a5568;letter-spacing:1.5px;text-transform:uppercase;padding:14px 20px 6px">Chapter 4</div>
+<a href="normalization.html"><i class="bi bi-diagram-3"></i> Normalization</a>
+  </nav>
+  <div class="sidebar-footer">logistics_db &nbsp;|&nbsp; MySQL</div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <h4><i class="bi bi-send me-2"></i>Deliveries</h4>
+    <button class="btn-add" onclick="openModal()"><i class="bi bi-plus-lg"></i> Add Delivery</button>
+  </div>
+  <div class="content">
+    <div class="panel">
+      <div class="panel-header">
+        <h6>All Deliveries</h6>
+        <span id="delivery-count" style="font-size:12px;color:#718096"></span>
+      </div>
+      <div style="padding:0">
+        <table class="data-table">
+          <thead><tr><th>Delivery ID</th><th>Order ID</th><th>Assigned At</th><th>Completed At</th><th>Actions</th></tr></thead>
+          <tbody id="deliveries-tbody">
+            <tr><td colspan="5" style="padding:20px;color:#a0aec0"><span class="spinner"></span>Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Full delivery report -->
+    <div class="panel">
+      <div class="panel-header">
+        <h6><i class="bi bi-table me-1"></i>Full Delivery Report (Multi-table JOIN)</h6>
+      </div>
+      <div style="padding:0">
+        <table class="data-table">
+          <thead><tr><th>Order ID</th><th>Order Date</th><th>Driver</th><th>Vehicle Type</th><th>Duration</th></tr></thead>
+          <tbody id="report-tbody">
+            <tr><td colspan="5" style="padding:20px;color:#a0aec0"><span class="spinner"></span>Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <h5 id="modal-title">Add New Delivery</h5>
+    <div class="form-group"><label>Delivery ID</label><input type="number" id="f-id" placeholder="e.g. 1004"/></div>
+    <div class="form-group"><label>Order ID</label><input type="number" id="f-order" placeholder="e.g. 5001"/></div>
+    <div class="form-group"><label>Assignment Time</label><input type="datetime-local" id="f-assign"/></div>
+    <div class="form-group"><label>Completed Time</label><input type="datetime-local" id="f-complete"/></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveDelivery()">Save</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+  const API = 'http://localhost:3000';
+  let editingId = null;
+
+  async function loadDeliveries() {
+    try {
+      const res  = await fetch(`${API}/api/deliveries`);
+      const data = await res.json();
+      document.getElementById('delivery-count').textContent = `${data.length} records`;
+      document.getElementById('deliveries-tbody').innerHTML = data.map(d => `
+        <tr>
+          <td>${d.Deliver_id}</td>
+          <td>${d.Order_id}</td>
+          <td>${d.Assignment_time ? new Date(d.Assignment_time).toLocaleString('en-IN') : '—'}</td>
+          <td>${d.Completed_time  ? new Date(d.Completed_time).toLocaleString('en-IN')  : '—'}</td>
+          <td>
+            <button class="btn-edit" onclick='editDelivery(${JSON.stringify(d)})'>Edit</button>
+            <button class="btn-delete" onclick="deleteDelivery(${d.Deliver_id})">Delete</button>
+          </td>
+        </tr>`).join('');
+    } catch {
+      document.getElementById('deliveries-tbody').innerHTML =
+        '<tr><td colspan="5" style="padding:20px;color:#e53e3e">Could not load deliveries.</td></tr>';
+    }
+  }
+
+  async function loadReport() {
+    try {
+      const res  = await fetch(`${API}/api/reports/full-delivery-report`);
+      const data = await res.json();
+      document.getElementById('report-tbody').innerHTML = data.map(r => `
+        <tr>
+          <td>${r.Order_Id}</td>
+          <td>${r.Oder_Date ? new Date(r.Oder_Date).toLocaleDateString('en-IN') : '—'}</td>
+          <td>${r.Driver_Name}</td>
+          <td>${r.Vehicle_Type}</td>
+          <td><span class="duration-pill">${r.Duration}</span></td>
+        </tr>`).join('');
+    } catch {
+      document.getElementById('report-tbody').innerHTML =
+        '<tr><td colspan="5" style="padding:20px;color:#e53e3e">Could not load report.</td></tr>';
+    }
+  }
+
+  function openModal() {
+    editingId = null;
+    document.getElementById('modal-title').textContent = 'Add New Delivery';
+    ['f-id','f-order','f-assign','f-complete'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('f-id').disabled = false;
+    document.getElementById('modal').classList.add('open');
+  }
+
+  function closeModal() { document.getElementById('modal').classList.remove('open'); }
+
+  function editDelivery(d) {
+    editingId = d.Deliver_id;
+    document.getElementById('modal-title').textContent = 'Edit Delivery';
+    document.getElementById('f-id').value      = d.Deliver_id;
+    document.getElementById('f-order').value   = d.Order_id;
+    document.getElementById('f-assign').value  = d.Assignment_time ? d.Assignment_time.slice(0,16) : '';
+    document.getElementById('f-complete').value= d.Completed_time  ? d.Completed_time.slice(0,16)  : '';
+    document.getElementById('f-id').disabled   = true;
+    document.getElementById('modal').classList.add('open');
+  }
+
+  async function saveDelivery() {
+    const order   = document.getElementById('f-order').value.trim();
+    const assign  = document.getElementById('f-assign').value;
+    const complete= document.getElementById('f-complete').value;
+    if (!order || !assign) { showToast('Please fill required fields'); return; }
+
+    const body   = { Order_id: parseInt(order), Assignment_time: assign, Completed_time: complete || null };
+    const url    = editingId ? `${API}/api/deliveries/${editingId}` : `${API}/api/deliveries`;
+    const method = editingId ? 'PUT' : 'POST';
+    if (!editingId) body.Deliver_id = parseInt(document.getElementById('f-id').value);
+
+    try {
+      const res  = await fetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+      const data = await res.json();
+      showToast(data.message || 'Saved');
+      closeModal(); loadDeliveries(); loadReport();
+    } catch { showToast('Error saving'); }
+  }
+
+  async function deleteDelivery(id) {
+    if (!confirm(`Delete delivery ${id}?`)) return;
+    try {
+      await fetch(`${API}/api/deliveries/${id}`, { method: 'DELETE' });
+      showToast('Deleted'); loadDeliveries(); loadReport();
+    } catch { showToast('Error deleting'); }
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.style.display = 'block';
+    setTimeout(() => t.style.display = 'none', 3000);
+  }
+
+  loadDeliveries(); loadReport();
+</script>
+</body>
+</html>

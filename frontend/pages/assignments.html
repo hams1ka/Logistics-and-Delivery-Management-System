@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Assignments — LogiOps</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',sans-serif;background:#f0f2f5;display:flex;min-height:100vh}
+    .sidebar{width:240px;min-height:100vh;background:#1a1f36;color:#fff;display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100}
+    .sidebar-brand{padding:20px 16px;border-bottom:1px solid #2e3457}
+    .sidebar-brand h5{font-size:13px;font-weight:700;color:#7c83fd;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
+    .sidebar-brand p{font-size:11px;color:#8892b0;margin:0}
+    .sidebar-nav{padding:12px 0;flex:1}
+    .nav-section-label{font-size:10px;font-weight:700;color:#4a5568;letter-spacing:1.5px;text-transform:uppercase;padding:14px 20px 6px}
+    .sidebar-nav a{display:flex;align-items:center;gap:10px;padding:10px 20px;color:#a0aec0;text-decoration:none;font-size:13.5px;transition:all .2s;border-left:3px solid transparent}
+    .sidebar-nav a:hover,.sidebar-nav a.active{background:#252b4a;color:#fff;border-left-color:#7c83fd}
+    .sidebar-nav a i{font-size:16px;width:20px}
+    .sidebar-footer{padding:14px 20px;font-size:11px;color:#4a5568;border-top:1px solid #2e3457}
+    .main{margin-left:240px;flex:1;display:flex;flex-direction:column}
+    .topbar{background:#fff;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:50}
+    .topbar h4{font-size:16px;font-weight:700;color:#1a1f36;margin:0}
+    .topbar-right{display:flex;align-items:center;gap:10px}
+    .search-box{padding:7px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;width:260px;color:#2d3748}
+    .search-box:focus{border-color:#7c83fd}
+    .content{padding:28px}
+    .panel{background:#fff;border-radius:12px;border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:24px;overflow:hidden}
+    .panel-header{padding:16px 20px;border-bottom:1px solid #f0f2f5;display:flex;align-items:center;justify-content:space-between}
+    .panel-header h6{font-size:14px;font-weight:700;color:#1a1f36;margin:0}
+    .data-table{width:100%;border-collapse:collapse;font-size:13px}
+    .data-table th{background:#f7f8fc;padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #e2e8f0}
+    .data-table td{padding:11px 14px;border-bottom:1px solid #f0f2f5;color:#2d3748}
+    .data-table tr:last-child td{border-bottom:none}
+    .data-table tr:hover td{background:#f7f8fc}
+    .btn-add{background:#7c83fd;color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px}
+    .btn-add:hover{background:#6366f1}
+    .btn-edit{background:#dbeafe;color:#1d4ed8;border:none;padding:4px 10px;border-radius:6px;font-size:12px;cursor:pointer}
+    .btn-delete{background:#fee2e2;color:#dc2626;border:none;padding:4px 10px;border-radius:6px;font-size:12px;cursor:pointer;margin-left:4px}
+    .highlight{background:#fef9c3;border-radius:3px;padding:0 2px}
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;align-items:center;justify-content:center}
+    .modal-overlay.open{display:flex}
+    .modal-box{background:#fff;border-radius:14px;width:440px;padding:28px;box-shadow:0 8px 32px rgba(0,0,0,.15)}
+    .modal-box h5{font-size:15px;font-weight:700;color:#1a1f36;margin-bottom:20px}
+    .form-group{margin-bottom:14px}
+    .form-group label{font-size:12px;font-weight:600;color:#4a5568;display:block;margin-bottom:5px}
+    .form-group input{width:100%;padding:9px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none}
+    .form-group input:focus{border-color:#7c83fd}
+    .modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+    .btn-cancel{background:#f7f8fc;color:#4a5568;border:1px solid #e2e8f0;padding:8px 18px;border-radius:8px;font-size:13px;cursor:pointer}
+    .btn-save{background:#7c83fd;color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:13px;cursor:pointer}
+    .toast{position:fixed;bottom:24px;right:24px;background:#1a1f36;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;z-index:999;display:none}
+    .spinner{display:inline-block;width:18px;height:18px;border:2px solid #e2e8f0;border-top-color:#7c83fd;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand"><h5>&#9650; LogiOps</h5><p>Delivery Management System</p></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <a href="../index.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <div class="nav-section-label">Manage</div>
+    <a href="drivers.html"><i class="bi bi-person-badge"></i> Drivers</a>
+    <a href="vehicles.html"><i class="bi bi-truck"></i> Vehicles</a>
+    <a href="orders.html"><i class="bi bi-box-seam"></i> Orders</a>
+    <a href="deliveries.html"><i class="bi bi-send"></i> Deliveries</a>
+    <a href="assignments.html" class="active"><i class="bi bi-clipboard-check"></i> Assignments</a>
+    <a href="locations.html"><i class="bi bi-geo-alt"></i> Locations</a>
+    <a href="routes.html"><i class="bi bi-signpost-split"></i> Routes</a>
+    <a href="servicehistory.html"><i class="bi bi-tools"></i> Service History</a>
+    <div class="nav-section-label">Analytics</div>
+    <a href="reports.html"><i class="bi bi-bar-chart-line"></i> Reports</a>
+    <div class="nav-label" style="font-size:10px;font-weight:700;color:#4a5568;letter-spacing:1.5px;text-transform:uppercase;padding:14px 20px 6px">Chapter 4</div>
+<a href="normalization.html"><i class="bi bi-diagram-3"></i> Normalization</a>
+  </nav>
+  <div class="sidebar-footer">logistics_db &nbsp;|&nbsp; MySQL</div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <h4><i class="bi bi-clipboard-check me-2"></i>Assignments</h4>
+    <div class="topbar-right">
+      <input
+        class="search-box"
+        type="text"
+        id="search-box"
+        placeholder="&#128269; Search driver ID or vehicle ID..."
+        oninput="searchAssignments()"
+      />
+      <button class="btn-add" onclick="openModal()">
+        <i class="bi bi-plus-lg"></i> Add Assignment
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- All assignments -->
+    <div class="panel">
+      <div class="panel-header">
+        <h6>All Assignments</h6>
+        <span id="assignment-count" style="font-size:12px;color:#718096"></span>
+      </div>
+      <div style="padding:0">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Delivery ID</th>
+              <th>Driver ID</th>
+              <th>Vehicle ID</th>
+              <th>Start Time</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="assignments-tbody">
+            <tr><td colspan="6" style="padding:20px;color:#a0aec0">
+              <span class="spinner"></span>Loading...
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- INNER JOIN details -->
+    <div class="panel">
+      <div class="panel-header">
+        <h6><i class="bi bi-link me-1"></i>Assignment Details (INNER JOIN — Driver + Vehicle)</h6>
+      </div>
+      <div style="padding:0">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Assignment ID</th>
+              <th>Driver Name</th>
+              <th>Plate Number</th>
+              <th>Vehicle Type</th>
+              <th>Start Time</th>
+            </tr>
+          </thead>
+          <tbody id="joined-tbody">
+            <tr><td colspan="5" style="padding:20px;color:#a0aec0">
+              <span class="spinner"></span>Loading...
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Add / Edit Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <h5 id="modal-title">Add New Assignment</h5>
+    <div class="form-group">
+      <label>Assignment ID</label>
+      <input type="number" id="f-id" placeholder="e.g. 4"/>
+    </div>
+    <div class="form-group">
+      <label>Delivery ID</label>
+      <input type="number" id="f-delivery" placeholder="e.g. 1001"/>
+    </div>
+    <div class="form-group">
+      <label>Driver ID</label>
+      <input type="number" id="f-driver" placeholder="e.g. 201"/>
+    </div>
+    <div class="form-group">
+      <label>Vehicle ID</label>
+      <input type="number" id="f-vehicle" placeholder="e.g. 301"/>
+    </div>
+    <div class="form-group">
+      <label>Start Time</label>
+      <input type="datetime-local" id="f-start"/>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save"   onclick="saveAssignment()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const API            = 'http://localhost:3000';
+  let allAssignments   = [];
+  let editingId        = null;
+
+  // ── Load all assignments from API ──
+  async function loadAssignments() {
+    try {
+      const res      = await fetch(`${API}/api/assignments`);
+      allAssignments = await res.json();
+      renderAssignments(allAssignments);
+    } catch {
+      document.getElementById('assignments-tbody').innerHTML =
+        '<tr><td colspan="6" style="padding:20px;color:#e53e3e">Could not load. Is the server running?</td></tr>';
+    }
+  }
+
+  // ── Render assignments into table ──
+  function renderAssignments(data) {
+    document.getElementById('assignment-count').textContent =
+      `${data.length} record${data.length !== 1 ? 's' : ''}`;
+
+    if (data.length === 0) {
+      document.getElementById('assignments-tbody').innerHTML =
+        '<tr><td colspan="6" style="padding:20px;color:#718096;text-align:center">No assignments match your search</td></tr>';
+      return;
+    }
+
+    const q = document.getElementById('search-box').value.toLowerCase();
+
+    document.getElementById('assignments-tbody').innerHTML = data.map(a => `
+      <tr>
+        <td>${hl(String(a.Assignment_id), q)}</td>
+        <td>${hl(String(a.Delivery_id),   q)}</td>
+        <td>${hl(String(a.Driver_id),     q)}</td>
+        <td>${hl(String(a.Vehicle_id),    q)}</td>
+        <td>${a.Start_time ? new Date(a.Start_time).toLocaleString('en-IN') : '—'}</td>
+        <td>
+          <button class="btn-edit"   onclick='editAssignment(${JSON.stringify(a)})'>Edit</button>
+          <button class="btn-delete" onclick="deleteAssignment(${a.Assignment_id})">Delete</button>
+        </td>
+      </tr>`).join('');
+  }
+
+  // ── Search assignments client-side ──
+  function searchAssignments() {
+    const q = document.getElementById('search-box').value.toLowerCase().trim();
+    if (!q) { renderAssignments(allAssignments); return; }
+    renderAssignments(allAssignments.filter(a =>
+      String(a.Driver_id).includes(q)      ||
+      String(a.Vehicle_id).includes(q)     ||
+      String(a.Delivery_id).includes(q)    ||
+      String(a.Assignment_id).includes(q)
+    ));
+  }
+
+  // ── Highlight matched text ──
+  function hl(text, query) {
+    if (!query || !text) return text;
+    const e = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return text.replace(new RegExp(e, 'gi'),
+      m => `<span class="highlight">${m}</span>`);
+  }
+
+  // ── Load INNER JOIN result ──
+  async function loadJoined() {
+    try {
+      const res  = await fetch(`${API}/api/reports/assignment-details`);
+      const data = await res.json();
+      document.getElementById('joined-tbody').innerHTML = data.map(r => `
+        <tr>
+          <td>${r.Assignment_id}</td>
+          <td>${r.Driver_Name}</td>
+          <td>${r.Plate_Number}</td>
+          <td>${r.Vehicle_Type}</td>
+          <td>${r.Start_time ? new Date(r.Start_time).toLocaleString('en-IN') : '—'}</td>
+        </tr>`).join('');
+    } catch {
+      document.getElementById('joined-tbody').innerHTML =
+        '<tr><td colspan="5" style="padding:20px;color:#e53e3e">Could not load joined data.</td></tr>';
+    }
+  }
+
+  // ── Open modal for ADD ──
+  function openModal() {
+    editingId = null;
+    document.getElementById('modal-title').textContent = 'Add New Assignment';
+    ['f-id', 'f-delivery', 'f-driver', 'f-vehicle', 'f-start'].forEach(id =>
+      document.getElementById(id).value = '');
+    document.getElementById('f-id').disabled = false;
+    document.getElementById('modal').classList.add('open');
+  }
+
+  // ── Close modal ──
+  function closeModal() {
+    document.getElementById('modal').classList.remove('open');
+  }
+
+  // ── Open modal for EDIT ──
+  function editAssignment(a) {
+    editingId = a.Assignment_id;
+    document.getElementById('modal-title').textContent  = 'Edit Assignment';
+    document.getElementById('f-id').value       = a.Assignment_id;
+    document.getElementById('f-delivery').value = a.Delivery_id;
+    document.getElementById('f-driver').value   = a.Driver_id;
+    document.getElementById('f-vehicle').value  = a.Vehicle_id;
+    document.getElementById('f-start').value    = a.Start_time
+      ? a.Start_time.slice(0, 16) : '';
+    document.getElementById('f-id').disabled    = true;
+    document.getElementById('modal').classList.add('open');
+  }
+
+  // ── Save (POST or PUT) ──
+  async function saveAssignment() {
+    const delivery = document.getElementById('f-delivery').value.trim();
+    const driver   = document.getElementById('f-driver').value.trim();
+    const vehicle  = document.getElementById('f-vehicle').value.trim();
+    const start    = document.getElementById('f-start').value;
+    if (!delivery || !driver || !vehicle || !start) {
+      showToast('Please fill all fields'); return;
+    }
+
+    const body   = {
+      Delivery_id : parseInt(delivery),
+      Driver_id   : parseInt(driver),
+      Vehicle_id  : parseInt(vehicle),
+      Start_time  : start
+    };
+    const url    = editingId
+      ? `${API}/api/assignments/${editingId}`
+      : `${API}/api/assignments`;
+    const method = editingId ? 'PUT' : 'POST';
+    if (!editingId) body.Assignment_id = parseInt(document.getElementById('f-id').value);
+
+    try {
+      const res  = await fetch(url, {
+        method,
+        headers : { 'Content-Type': 'application/json' },
+        body    : JSON.stringify(body)
+      });
+      const data = await res.json();
+      showToast(data.message || 'Saved');
+      closeModal();
+      loadAssignments();
+      loadJoined();
+    } catch { showToast('Error saving'); }
+  }
+
+  // ── Delete ──
+  async function deleteAssignment(id) {
+    if (!confirm(`Delete assignment ${id}?`)) return;
+    try {
+      await fetch(`${API}/api/assignments/${id}`, { method: 'DELETE' });
+      showToast('Assignment deleted');
+      loadAssignments();
+      loadJoined();
+    } catch { showToast('Error deleting'); }
+  }
+
+  // ── Toast ──
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent   = msg;
+    t.style.display = 'block';
+    setTimeout(() => t.style.display = 'none', 3000);
+  }
+
+  // ── Clear search on Escape ──
+  document.getElementById('search-box').addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      document.getElementById('search-box').value = '';
+      renderAssignments(allAssignments);
+    }
+  });
+
+  // ── Load everything on page open ──
+  loadAssignments();
+  loadJoined();
+</script>
+</body>
+</html>

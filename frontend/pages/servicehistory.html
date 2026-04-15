@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Service History — LogiOps</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',sans-serif;background:#f0f2f5;display:flex;min-height:100vh}
+    .sidebar{width:240px;min-height:100vh;background:#1a1f36;color:#fff;display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100}
+    .sidebar-brand{padding:20px 16px;border-bottom:1px solid #2e3457}
+    .sidebar-brand h5{font-size:13px;font-weight:700;color:#7c83fd;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
+    .sidebar-brand p{font-size:11px;color:#8892b0;margin:0}
+    .sidebar-nav{padding:12px 0;flex:1}
+    .nav-section-label{font-size:10px;font-weight:700;color:#4a5568;letter-spacing:1.5px;text-transform:uppercase;padding:14px 20px 6px}
+    .sidebar-nav a{display:flex;align-items:center;gap:10px;padding:10px 20px;color:#a0aec0;text-decoration:none;font-size:13.5px;transition:all .2s;border-left:3px solid transparent}
+    .sidebar-nav a:hover,.sidebar-nav a.active{background:#252b4a;color:#fff;border-left-color:#7c83fd}
+    .sidebar-nav a i{font-size:16px;width:20px}
+    .sidebar-footer{padding:14px 20px;font-size:11px;color:#4a5568;border-top:1px solid #2e3457}
+    .main{margin-left:240px;flex:1;display:flex;flex-direction:column}
+    .topbar{background:#fff;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:50}
+    .topbar h4{font-size:16px;font-weight:700;color:#1a1f36;margin:0}
+    .topbar-right{display:flex;align-items:center;gap:10px}
+    .search-box{padding:7px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;width:280px;color:#2d3748}
+    .search-box:focus{border-color:#7c83fd}
+    .content{padding:28px}
+    .panel{background:#fff;border-radius:12px;border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:24px;overflow:hidden}
+    .panel-header{padding:16px 20px;border-bottom:1px solid #f0f2f5;display:flex;align-items:center;justify-content:space-between}
+    .panel-header h6{font-size:14px;font-weight:700;color:#1a1f36;margin:0}
+    .data-table{width:100%;border-collapse:collapse;font-size:13px}
+    .data-table th{background:#f7f8fc;padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #e2e8f0}
+    .data-table td{padding:11px 14px;border-bottom:1px solid #f0f2f5;color:#2d3748}
+    .data-table tr:last-child td{border-bottom:none}
+    .data-table tr:hover td{background:#f7f8fc}
+    .btn-add{background:#7c83fd;color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px}
+    .btn-add:hover{background:#6366f1}
+    .btn-edit{background:#dbeafe;color:#1d4ed8;border:none;padding:4px 10px;border-radius:6px;font-size:12px;cursor:pointer}
+    .btn-delete{background:#fee2e2;color:#dc2626;border:none;padding:4px 10px;border-radius:6px;font-size:12px;cursor:pointer;margin-left:4px}
+    .mtype-pill{background:#fef3c7;color:#92400e;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+    .highlight{background:#fef9c3;border-radius:3px;padding:0 2px}
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;align-items:center;justify-content:center}
+    .modal-overlay.open{display:flex}
+    .modal-box{background:#fff;border-radius:14px;width:440px;padding:28px;box-shadow:0 8px 32px rgba(0,0,0,.15)}
+    .modal-box h5{font-size:15px;font-weight:700;color:#1a1f36;margin-bottom:20px}
+    .form-group{margin-bottom:14px}
+    .form-group label{font-size:12px;font-weight:600;color:#4a5568;display:block;margin-bottom:5px}
+    .form-group input{width:100%;padding:9px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none}
+    .form-group input:focus{border-color:#7c83fd}
+    .modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+    .btn-cancel{background:#f7f8fc;color:#4a5568;border:1px solid #e2e8f0;padding:8px 18px;border-radius:8px;font-size:13px;cursor:pointer}
+    .btn-save{background:#7c83fd;color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:13px;cursor:pointer}
+    .toast{position:fixed;bottom:24px;right:24px;background:#1a1f36;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;z-index:999;display:none}
+    .spinner{display:inline-block;width:18px;height:18px;border:2px solid #e2e8f0;border-top-color:#7c83fd;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand"><h5>&#9650; LogiOps</h5><p>Delivery Management System</p></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <a href="../index.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <div class="nav-section-label">Manage</div>
+    <a href="drivers.html"><i class="bi bi-person-badge"></i> Drivers</a>
+    <a href="vehicles.html"><i class="bi bi-truck"></i> Vehicles</a>
+    <a href="orders.html"><i class="bi bi-box-seam"></i> Orders</a>
+    <a href="deliveries.html"><i class="bi bi-send"></i> Deliveries</a>
+    <a href="assignments.html"><i class="bi bi-clipboard-check"></i> Assignments</a>
+    <a href="locations.html"><i class="bi bi-geo-alt"></i> Locations</a>
+    <a href="routes.html"><i class="bi bi-signpost-split"></i> Routes</a>
+    <a href="servicehistory.html" class="active"><i class="bi bi-tools"></i> Service History</a>
+    <div class="nav-section-label">Analytics</div>
+    <a href="reports.html"><i class="bi bi-bar-chart-line"></i> Reports</a>
+    <div class="nav-label" style="font-size:10px;font-weight:700;color:#4a5568;letter-spacing:1.5px;text-transform:uppercase;padding:14px 20px 6px">Chapter 4</div>
+    <a href="normalization.html"><i class="bi bi-diagram-3"></i> Normalization</a>
+  </nav>
+  <div class="sidebar-footer">logistics_db &nbsp;|&nbsp; MySQL</div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <h4><i class="bi bi-tools me-2"></i>Service History</h4>
+    <div class="topbar-right">
+      <input
+        class="search-box"
+        type="text"
+        id="search-box"
+        placeholder="&#128269; Search vehicle ID or maintenance type..."
+        oninput="searchService()"
+      />
+      <button class="btn-add" onclick="openModal()">
+        <i class="bi bi-plus-lg"></i> Add Record
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- All service records -->
+    <div class="panel">
+      <div class="panel-header">
+        <h6>All Service Records</h6>
+        <span id="service-count" style="font-size:12px;color:#718096"></span>
+      </div>
+      <div style="padding:0">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Record ID</th>
+              <th>Vehicle ID</th>
+              <th>Maintenance Type</th>
+              <th>Service Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="service-tbody">
+            <tr><td colspan="5" style="padding:20px;color:#a0aec0">
+              <span class="spinner"></span>Loading...
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Vehicle service report -->
+    <div class="panel">
+      <div class="panel-header">
+        <h6><i class="bi bi-truck me-1"></i>Vehicle Service Report (Latest per Vehicle)</h6>
+      </div>
+      <div style="padding:0">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Vehicle ID</th>
+              <th>Plate Number</th>
+              <th>Vehicle Type</th>
+              <th>Last Maintenance</th>
+              <th>Service Date</th>
+            </tr>
+          </thead>
+          <tbody id="report-tbody">
+            <tr><td colspan="5" style="padding:20px;color:#a0aec0">
+              <span class="spinner"></span>Loading...
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Add / Edit Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <h5 id="modal-title">Add Service Record</h5>
+    <div class="form-group">
+      <label>Record ID</label>
+      <input type="number" id="f-id" placeholder="e.g. 704"/>
+    </div>
+    <div class="form-group">
+      <label>Vehicle ID</label>
+      <input type="number" id="f-vehicle" placeholder="e.g. 301"/>
+    </div>
+    <div class="form-group">
+      <label>Maintenance Type</label>
+      <input type="text" id="f-type" placeholder="e.g. Oil Change"/>
+    </div>
+    <div class="form-group">
+      <label>Service Date</label>
+      <input type="date" id="f-date"/>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save"   onclick="saveRecord()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const API        = 'http://localhost:3000';
+  let allService   = [];
+  let editingId    = null;
+
+  // ── Load all service records ──
+  async function loadService() {
+    try {
+      const res  = await fetch(`${API}/api/servicehistory`);
+      allService = await res.json();
+      renderService(allService);
+    } catch {
+      document.getElementById('service-tbody').innerHTML =
+        '<tr><td colspan="5" style="padding:20px;color:#e53e3e">Could not load. Is the server running?</td></tr>';
+    }
+  }
+
+  // ── Render service records into table ──
+  function renderService(data) {
+    document.getElementById('service-count').textContent =
+      `${data.length} record${data.length !== 1 ? 's' : ''}`;
+
+    if (data.length === 0) {
+      document.getElementById('service-tbody').innerHTML =
+        '<tr><td colspan="5" style="padding:20px;color:#718096;text-align:center">No records match your search</td></tr>';
+      return;
+    }
+
+    const q = document.getElementById('search-box').value.toLowerCase();
+
+    document.getElementById('service-tbody').innerHTML = data.map(s => `
+      <tr>
+        <td>${hl(String(s.Record_id),  q)}</td>
+        <td>${hl(String(s.Vehicle_id), q)}</td>
+        <td><span class="mtype-pill">${hl(s.Maintenance_Type, q)}</span></td>
+        <td>${s.Service_Date ? new Date(s.Service_Date).toLocaleDateString('en-IN') : '—'}</td>
+        <td>
+          <button class="btn-edit"   onclick='editRecord(${JSON.stringify(s)})'>Edit</button>
+          <button class="btn-delete" onclick="deleteRecord(${s.Record_id})">Delete</button>
+        </td>
+      </tr>`).join('');
+  }
+
+  // ── Search service records client-side ──
+  function searchService() {
+    const q = document.getElementById('search-box').value.toLowerCase().trim();
+    if (!q) { renderService(allService); return; }
+    renderService(allService.filter(s =>
+      String(s.Vehicle_id).includes(q)              ||
+      s.Maintenance_Type.toLowerCase().includes(q)  ||
+      String(s.Record_id).includes(q)
+    ));
+  }
+
+  // ── Highlight matched text ──
+  function hl(text, query) {
+    if (!query || !text) return text;
+    const e = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return text.replace(new RegExp(e, 'gi'),
+      m => `<span class="highlight">${m}</span>`);
+  }
+
+  // ── Load vehicle service report ──
+  async function loadReport() {
+    try {
+      const res  = await fetch(`${API}/api/reports/vehicle-service-report`);
+      const data = await res.json();
+      document.getElementById('report-tbody').innerHTML = data.map(r => `
+        <tr>
+          <td>${r.Vehicle_Id}</td>
+          <td>${r.Plate_Number}</td>
+          <td>${r.Vehicle_Type}</td>
+          <td><span class="mtype-pill">${r.Maintenance_Type}</span></td>
+          <td>${r.Service_Date ? new Date(r.Service_Date).toLocaleDateString('en-IN') : '—'}</td>
+        </tr>`).join('');
+    } catch {
+      document.getElementById('report-tbody').innerHTML =
+        '<tr><td colspan="5" style="padding:20px;color:#e53e3e">Could not load report.</td></tr>';
+    }
+  }
+
+  // ── Open modal for ADD ──
+  function openModal() {
+    editingId = null;
+    document.getElementById('modal-title').textContent = 'Add Service Record';
+    ['f-id', 'f-vehicle', 'f-type', 'f-date'].forEach(id =>
+      document.getElementById(id).value = '');
+    document.getElementById('f-id').disabled = false;
+    document.getElementById('modal').classList.add('open');
+  }
+
+  // ── Close modal ──
+  function closeModal() {
+    document.getElementById('modal').classList.remove('open');
+  }
+
+  // ── Open modal for EDIT ──
+  function editRecord(s) {
+    editingId = s.Record_id;
+    document.getElementById('modal-title').textContent = 'Edit Service Record';
+    document.getElementById('f-id').value      = s.Record_id;
+    document.getElementById('f-vehicle').value = s.Vehicle_id;
+    document.getElementById('f-type').value    = s.Maintenance_Type;
+    document.getElementById('f-date').value    = s.Service_Date
+      ? s.Service_Date.split('T')[0] : '';
+    document.getElementById('f-id').disabled   = true;
+    document.getElementById('modal').classList.add('open');
+  }
+
+  // ── Save (POST or PUT) ──
+  async function saveRecord() {
+    const vehicle = document.getElementById('f-vehicle').value.trim();
+    const type    = document.getElementById('f-type').value.trim();
+    const date    = document.getElementById('f-date').value;
+    if (!vehicle || !type || !date) { showToast('Please fill all fields'); return; }
+
+    const body   = {
+      Vehicle_id       : parseInt(vehicle),
+      Maintenance_Type : type,
+      Service_Date     : date
+    };
+    const url    = editingId
+      ? `${API}/api/servicehistory/${editingId}`
+      : `${API}/api/servicehistory`;
+    const method = editingId ? 'PUT' : 'POST';
+    if (!editingId) body.Record_id = parseInt(document.getElementById('f-id').value);
+
+    try {
+      const res  = await fetch(url, {
+        method,
+        headers : { 'Content-Type': 'application/json' },
+        body    : JSON.stringify(body)
+      });
+      const data = await res.json();
+      showToast(data.message || 'Saved');
+      closeModal();
+      loadService();
+      loadReport();
+    } catch { showToast('Error saving'); }
+  }
+
+  // ── Delete ──
+  async function deleteRecord(id) {
+    if (!confirm(`Delete record ${id}?`)) return;
+    try {
+      await fetch(`${API}/api/servicehistory/${id}`, { method: 'DELETE' });
+      showToast('Record deleted');
+      loadService();
+      loadReport();
+    } catch { showToast('Error deleting'); }
+  }
+
+  // ── Toast ──
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent   = msg;
+    t.style.display = 'block';
+    setTimeout(() => t.style.display = 'none', 3000);
+  }
+
+  // ── Clear search on Escape ──
+  document.getElementById('search-box').addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      document.getElementById('search-box').value = '';
+      renderService(allService);
+    }
+  });
+
+  // ── Load everything on page open ──
+  loadService();
+  loadReport();
+</script>
+</body>
+</html>

@@ -1,0 +1,344 @@
+### ─────────────────────────────────────────
+### BASE URL
+### ─────────────────────────────────────────
+@baseUrl = http://localhost:3000
+
+### ─────────────────────────────────────────
+### SERVER CHECK
+### ─────────────────────────────────────────
+
+### Check server is running
+GET {{baseUrl}}/
+
+### Check DB connection
+GET {{baseUrl}}/api/test
+
+### ─────────────────────────────────────────
+### DRIVERS
+### ─────────────────────────────────────────
+
+### Get all drivers
+GET {{baseUrl}}/api/drivers
+
+### Get driver by ID
+GET {{baseUrl}}/api/drivers/201
+
+### Add new driver
+POST {{baseUrl}}/api/drivers
+Content-Type: application/json
+
+{
+  "Driver_id": 204,
+  "Name": "Vijay Sharma",
+  "Phone_no": "9001122334",
+  "License_Number": "KA98765"
+}
+
+### Update driver
+PUT {{baseUrl}}/api/drivers/204
+Content-Type: application/json
+
+{
+  "Name": "Vijay Sharma Updated",
+  "Phone_no": "9001122334",
+  "License_Number": "KA98765"
+}
+
+### Delete driver
+DELETE {{baseUrl}}/api/drivers/204
+
+### ─────────────────────────────────────────
+### VEHICLES
+### ─────────────────────────────────────────
+
+### Get all vehicles
+GET {{baseUrl}}/api/vehicles
+
+### Get vehicle by ID
+GET {{baseUrl}}/api/vehicles/301
+
+### Add new vehicle
+POST {{baseUrl}}/api/vehicles
+Content-Type: application/json
+
+{
+  "Vehicle_Id": 304,
+  "Plate_Number": "KA05GH3456",
+  "Vehicle_Type": "Mini Van",
+  "Capacity": 400,
+  "Availability_Status": "Available"
+}
+
+### Update vehicle
+PUT {{baseUrl}}/api/vehicles/304
+Content-Type: application/json
+
+{
+  "Plate_Number": "KA05GH3456",
+  "Vehicle_Type": "Mini Van",
+  "Capacity": 450,
+  "Availability_Status": "In Service"
+}
+
+### Delete vehicle
+DELETE {{baseUrl}}/api/vehicles/304
+
+### ─────────────────────────────────────────
+### ORDERS
+### ─────────────────────────────────────────
+
+### Get all orders
+GET {{baseUrl}}/api/orders
+
+### Get order by ID
+GET {{baseUrl}}/api/orders/5001
+
+### Add new order
+POST {{baseUrl}}/api/orders
+Content-Type: application/json
+
+{
+  "Order_Id": 5004,
+  "Oder_Date": "2024-03-04",
+  "Customer_Id": 904
+}
+
+### Update order
+PUT {{baseUrl}}/api/orders/5004
+Content-Type: application/json
+
+{
+  "Oder_Date": "2024-03-05",
+  "Customer_Id": 904
+}
+
+### Delete order
+DELETE {{baseUrl}}/api/orders/5004
+
+### ─────────────────────────────────────────
+### DELIVERIES
+### ─────────────────────────────────────────
+
+### Get all deliveries
+GET {{baseUrl}}/api/deliveries
+
+### Get delivery by ID
+GET {{baseUrl}}/api/deliveries/1001
+
+### Add new delivery
+POST {{baseUrl}}/api/deliveries
+Content-Type: application/json
+
+{
+  "Deliver_id": 1004,
+  "Order_id": 5001,
+  "Assignment_time": "2024-03-04 08:00:00",
+  "Completed_time": "2024-03-04 12:00:00"
+}
+
+### Update delivery
+PUT {{baseUrl}}/api/deliveries/1004
+Content-Type: application/json
+
+{
+  "Order_id": 5001,
+  "Assignment_time": "2024-03-04 08:00:00",
+  "Completed_time": "2024-03-04 13:00:00"
+}
+
+### Delete delivery
+DELETE {{baseUrl}}/api/deliveries/1004
+
+### ─────────────────────────────────────────
+### ASSIGNMENTS
+### ─────────────────────────────────────────
+
+### Get all assignments
+GET {{baseUrl}}/api/assignments
+
+### Get assignment by ID
+GET {{baseUrl}}/api/assignments/1
+
+### Add new assignment
+POST {{baseUrl}}/api/assignments
+Content-Type: application/json
+
+{
+  "Assignment_id": 4,
+  "Delivery_id": 1001,
+  "Driver_id": 201,
+  "Vehicle_id": 301,
+  "Start_time": "2024-03-04 08:00:00"
+}
+
+### Update assignment
+PUT {{baseUrl}}/api/assignments/4
+Content-Type: application/json
+
+{
+  "Delivery_id": 1001,
+  "Driver_id": 202,
+  "Vehicle_id": 302,
+  "Start_time": "2024-03-04 09:00:00"
+}
+
+### Delete assignment
+DELETE {{baseUrl}}/api/assignments/4
+
+### ─────────────────────────────────────────
+### LOCATIONS
+### ─────────────────────────────────────────
+
+### Get all locations
+GET {{baseUrl}}/api/locations
+
+### Get location by ID
+GET {{baseUrl}}/api/locations/401
+
+### Add new location
+POST {{baseUrl}}/api/locations
+Content-Type: application/json
+
+{
+  "Location_id": 404,
+  "Address": "Bangalore",
+  "Contact_No": "0801234567"
+}
+
+### Update location
+PUT {{baseUrl}}/api/locations/404
+Content-Type: application/json
+
+{
+  "Address": "Bengaluru",
+  "Contact_No": "0809876543"
+}
+
+### Delete location
+DELETE {{baseUrl}}/api/locations/404
+
+### ─────────────────────────────────────────
+### ROUTES
+### ─────────────────────────────────────────
+
+### Get all routes
+GET {{baseUrl}}/api/routes
+
+### Get route by ID
+GET {{baseUrl}}/api/routes/601
+
+### Add new route
+POST {{baseUrl}}/api/routes
+Content-Type: application/json
+
+{
+  "Route_id": 604,
+  "Distance": 410
+}
+
+### Update route
+PUT {{baseUrl}}/api/routes/604
+Content-Type: application/json
+
+{
+  "Distance": 430
+}
+
+### Delete route
+DELETE {{baseUrl}}/api/routes/604
+
+### ─────────────────────────────────────────
+### SERVICE HISTORY
+### ─────────────────────────────────────────
+
+### Get all service history
+GET {{baseUrl}}/api/servicehistory
+
+### Get service history by ID
+GET {{baseUrl}}/api/servicehistory/701
+
+### Add new service record
+POST {{baseUrl}}/api/servicehistory
+Content-Type: application/json
+
+{
+  "Record_id": 704,
+  "Vehicle_id": 301,
+  "Maintenance_Type": "Tyre Replacement",
+  "Service_Date": "2024-03-10"
+}
+
+### Update service record
+PUT {{baseUrl}}/api/servicehistory/704
+Content-Type: application/json
+
+{
+  "Vehicle_id": 301,
+  "Maintenance_Type": "Tyre Replacement + Alignment",
+  "Service_Date": "2024-03-10"
+}
+
+### Delete service record
+DELETE {{baseUrl}}/api/servicehistory/704
+
+### ─────────────────────────────────────────
+### REPORTS — AGGREGATE FUNCTIONS
+### ─────────────────────────────────────────
+
+### Total deliveries by each driver
+GET {{baseUrl}}/api/reports/deliveries-by-driver
+
+### Route statistics (avg, max, min, total distance)
+GET {{baseUrl}}/api/reports/route-stats
+
+### Vehicle count and capacity by availability status
+GET {{baseUrl}}/api/reports/vehicle-status-summary
+
+### ─────────────────────────────────────────
+### REPORTS — SET OPERATIONS
+### ─────────────────────────────────────────
+
+### UNION — combined driver and location contact list
+GET {{baseUrl}}/api/reports/contact-list
+
+### INTERSECT — vehicles in both Assignment and Service_History
+GET {{baseUrl}}/api/reports/vehicles-in-both-tables
+
+### EXCEPT — vehicles never assigned to any delivery
+GET {{baseUrl}}/api/reports/unassigned-vehicles
+
+### ─────────────────────────────────────────
+### REPORTS — SUBQUERIES
+### ─────────────────────────────────────────
+
+### Orders with delivery completed after 15:00
+GET {{baseUrl}}/api/reports/late-delivery-orders
+
+### Driver assigned to earliest assignment
+GET {{baseUrl}}/api/reports/earliest-driver
+
+### Vehicles with above average capacity
+GET {{baseUrl}}/api/reports/above-avg-capacity
+
+### ─────────────────────────────────────────
+### REPORTS — JOINS
+### ─────────────────────────────────────────
+
+### INNER JOIN — full assignment details
+GET {{baseUrl}}/api/reports/assignment-details
+
+### LEFT JOIN — all orders with delivery details
+GET {{baseUrl}}/api/reports/orders-with-deliveries
+
+### MULTI JOIN — full delivery report with duration
+GET {{baseUrl}}/api/reports/full-delivery-report
+
+### ─────────────────────────────────────────
+### REPORTS — VIEWS
+### ─────────────────────────────────────────
+
+### Driver assignment summary
+GET {{baseUrl}}/api/reports/driver-assignment-summary
+
+### Vehicle service report
+GET {{baseUrl}}/api/reports/vehicle-service-report
