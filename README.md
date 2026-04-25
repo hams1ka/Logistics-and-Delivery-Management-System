@@ -3,7 +3,7 @@ A scalable Logistics and Delivery Management System that helps manage orders, as
 
 📖 Overview
 The Logistics & Delivery Operations Management System (LogiOps) is a comprehensive full-stack web application that models and manages real-world logistics and delivery operations. Built as a DBMS mini-project, it demonstrates end-to-end database design from Entity-Relationship modelling through all six normal forms (1NF–5NF), complex SQL queries, stored procedures, triggers, and a live REST API-connected frontend dashboard.
-The system manages the complete lifecycle of a delivery operation — from driver and vehicle management to order placement, delivery tracking, route planning, and service history maintenance.
+The system manages the complete lifecycle of a delivery operation from driver and vehicle management to order placement, delivery tracking, route planning, and service history maintenance.
 
 ✨ Features
 🗄️ Database Layer
