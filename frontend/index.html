@@ -1,154 +1,389 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>LogiOps — Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <title>Logistics & Delivery Operations Management System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
   <style>
-    :root {
-      --bg:      #0d0f1a;
-      --bg2:     #13162a;
-      --bg3:     #1a1e35;
-      --border:  #252a45;
-      --accent:  #7c83fd;
-      --a2:      #a78bfa;
-      --green:   #34d399;
-      --amber:   #fbbf24;
-      --red:     #f87171;
-      --cyan:    #22d3ee;
-      --pink:    #f472b6;
-      --text:    #e2e8f0;
-      --muted:   #64748b;
-      --card:    #161929;
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
     }
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;overflow-x:hidden}
 
     /* ── Sidebar ── */
-    .sidebar{width:240px;min-height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100}
-    .sidebar-brand{padding:22px 18px 18px;border-bottom:1px solid var(--border)}
-    .brand-logo{display:flex;align-items:center;gap:10px;margin-bottom:4px}
-    .brand-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--a2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
-    .brand-name{font-size:14px;font-weight:600;color:var(--text);letter-spacing:.3px}
-    .brand-sub{font-size:10px;color:var(--muted);padding-left:42px}
-    .sidebar-nav{padding:10px 0;flex:1;overflow-y:auto}
-    .nav-label{font-size:9px;font-weight:600;color:var(--muted);letter-spacing:2px;text-transform:uppercase;padding:14px 18px 5px}
-    .sidebar-nav a{display:flex;align-items:center;gap:10px;padding:9px 18px;color:#8892b0;text-decoration:none;font-size:13px;transition:all .2s;border-left:2px solid transparent;position:relative}
-    .sidebar-nav a:hover,.sidebar-nav a.active{background:rgba(124,131,253,.08);color:var(--text);border-left-color:var(--accent)}
-    .sidebar-nav a i{font-size:15px;width:18px}
-    .sidebar-footer{padding:14px 18px;font-size:10px;color:var(--muted);border-top:1px solid var(--border);display:flex;align-items:center;gap:6px}
-    .online-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
-    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .sidebar {
+      width: 240px;
+      min-height: 100vh;
+      background: #1a1f36;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0;
+      z-index: 100;
+    }
 
-    /* ── Main ── */
-     .main{margin-left:240px;flex:1;min-height:100vh;display:flex;flex-direction:column;background:var(--bg)}
+    .sidebar-brand {
+      padding: 20px 16px;
+      border-bottom: 1px solid #2e3457;
+    }
 
+    .sidebar-brand h5 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #7c83fd;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
 
-    /* ── Topbar ── */
-    .topbar{background:var(--bg2);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);border-left:1px solid var(--border);position:sticky;top:0;z-index:50;backdrop-filter:blur(10px)}
-    .topbar-left h4{font-size:16px;font-weight:600;color:var(--text);margin:0}
-    .topbar-left p{font-size:11px;color:var(--muted);margin:2px 0 0}
-    .topbar-right{display:flex;align-items:center;gap:12px}
-    .time-chip{font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);background:rgba(124,131,253,.1);border:1px solid rgba(124,131,253,.2);padding:5px 12px;border-radius:8px}
-    .db-chip{font-size:11px;color:var(--green);background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);padding:5px 12px;border-radius:8px;display:flex;align-items:center;gap:5px}
+    .sidebar-brand p {
+      font-size: 11px;
+      color: #8892b0;
+      margin: 0;
+    }
 
-    /* ── Content ── */
-    .content{padding:24px 28px;flex:1}
+    .sidebar-nav { padding: 12px 0; flex: 1; overflow-y: auto; }
+
+    .nav-section-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #4a5568;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 14px 20px 6px;
+    }
+
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      color: #a0aec0;
+      text-decoration: none;
+      font-size: 13.5px;
+      transition: all 0.2s;
+      border-left: 3px solid transparent;
+    }
+
+    .sidebar-nav a:hover,
+    .sidebar-nav a.active {
+      background: #252b4a;
+      color: #fff;
+      border-left-color: #7c83fd;
+    }
+
+    .sidebar-nav a i { font-size: 16px; width: 20px; }
+
+    .sidebar-footer {
+      padding: 14px 20px;
+      font-size: 11px;
+      color: #4a5568;
+      border-top: 1px solid #2e3457;
+    }
+
+    /* ── Main content ── */
+    .main {
+      margin-left: 240px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      background: #fff;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #e2e8f0;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .topbar h4 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1a1f36;
+      margin: 0;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 13px;
+      color: #718096;
+    }
+
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #48bb78;
+      display: inline-block;
+      margin-right: 4px;
+    }
+
+    .content { padding: 28px; }
 
     /* ── Summary cards ── */
-    .summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
-    .s-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;display:flex;align-items:center;gap:14px;text-decoration:none;color:inherit;transition:all .25s;position:relative;overflow:hidden}
-    .s-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .25s;border-radius:12px}
-    .s-card:hover{transform:translateY(-2px);border-color:var(--accent)}
-    .s-card:hover::before{opacity:1}
-    .s-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-    .s-info h3{font-size:24px;font-weight:600;color:var(--text);line-height:1;margin-bottom:3px;font-family:'DM Mono',monospace}
-    .s-info p{font-size:11px;color:var(--muted);margin:0}
-    .s-trend{position:absolute;top:12px;right:14px;font-size:10px;font-family:'DM Mono',monospace;color:var(--green)}
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 28px;
+    }
 
-    /* ── Row of panels ── */
-    .row2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-    .row3{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px}
+    .summary-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      border: 1px solid #e2e8f0;
+      transition: transform 0.2s;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+    }
 
-    /* ── Panel ── */
-    .panel{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
-    .panel-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-    .panel-header h6{font-size:13px;font-weight:600;color:var(--text);margin:0;display:flex;align-items:center;gap:7px}
-    .panel-header a{font-size:11px;color:var(--accent);text-decoration:none;opacity:.8}
-    .panel-header a:hover{opacity:1}
+    .summary-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .card-icon {
+      width: 48px; height: 48px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .card-info h3 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #1a1f36;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .card-info p {
+      font-size: 12px;
+      color: #718096;
+      margin: 0;
+    }
+
+    /* ── Section panels ── */
+    .panel {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #f0f2f5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .panel-header h6 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1a1f36;
+      margin: 0;
+    }
+
+    .panel-body { padding: 20px; }
 
     /* ── Tables ── */
-    .dt{width:100%;border-collapse:collapse;font-size:12.5px}
-    .dt th{background:rgba(124,131,253,.06);padding:9px 16px;text-align:left;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid var(--border)}
-    .dt td{padding:10px 16px;border-bottom:1px solid rgba(37,42,69,.5);color:var(--text)}
-    .dt tr:last-child td{border-bottom:none}
-    .dt tr:hover td{background:rgba(124,131,253,.04)}
+    .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+    .data-table th {
+      background: #f7f8fc;
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      color: #718096;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .data-table td {
+      padding: 11px 14px;
+      border-bottom: 1px solid #f0f2f5;
+      color: #2d3748;
+    }
+
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: #f7f8fc; }
 
     /* ── Badges ── */
-    .badge-avail{background:rgba(52,211,153,.12);color:var(--green);padding:2px 9px;border-radius:20px;font-size:10px;font-weight:600;border:1px solid rgba(52,211,153,.2)}
-    .badge-service{background:rgba(34,211,238,.1);color:var(--cyan);padding:2px 9px;border-radius:20px;font-size:10px;font-weight:600;border:1px solid rgba(34,211,238,.2)}
-    .badge-type{background:rgba(124,131,253,.1);color:var(--accent);padding:2px 9px;border-radius:20px;font-size:10px;font-weight:500}
+    .badge-available {
+      background: #c6f6d5; color: #22543d;
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 600;
+    }
 
-    /* ── Route stat boxes ── */
-    .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:16px}
-    .stat-box{background:var(--bg3);border-radius:8px;padding:12px;text-align:center;border:1px solid var(--border)}
-    .stat-box .val{font-size:20px;font-weight:600;color:var(--text);font-family:'DM Mono',monospace}
-    .stat-box .lbl{font-size:10px;color:var(--muted);margin-top:3px}
+    .badge-inservice {
+      background: #bee3f8; color: #2a4365;
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 600;
+    }
 
-    /* ── Activity feed ── */
-    .activity-list{padding:10px 16px}
-    .act-item{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid rgba(37,42,69,.5)}
-    .act-item:last-child{border-bottom:none}
-    .act-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
-    .act-text{font-size:12px;color:var(--text);line-height:1.5}
-    .act-time{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;white-space:nowrap;margin-left:auto}
+    /* ── Two column grid ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
-    /* ── Delivery duration chart ── */
-    .dur-bar-wrap{padding:16px}
-    .dur-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-    .dur-label{font-size:12px;color:var(--muted);width:120px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .dur-bar-bg{flex:1;background:var(--bg3);border-radius:4px;height:8px;overflow:hidden}
-    .dur-bar-fill{height:100%;border-radius:4px;transition:width .8s ease}
-    .dur-val{font-size:11px;font-family:'DM Mono',monospace;color:var(--text);width:55px;text-align:right}
+    /* ── Stat row for reports ── */
+    .stat-row { display: flex; gap: 16px; flex-wrap: wrap; }
 
-    /* ── Mini KPI strip ── */
-    .kpi-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:14px}
-    .kpi{text-align:center;padding:10px;background:var(--bg3);border-radius:8px;border:1px solid var(--border)}
-    .kpi .kv{font-size:18px;font-weight:600;font-family:'DM Mono',monospace}
-    .kpi .kl{font-size:10px;color:var(--muted);margin-top:2px}
+    .stat-box {
+      flex: 1; min-width: 120px;
+      background: #f7f8fc;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      border: 1px solid #e2e8f0;
+    }
 
-    /* ── Loading ── */
-    .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .loading{padding:18px;color:var(--muted);font-size:12px}
+    .stat-box .val {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1a1f36;
+    }
 
-    /* ── Glow dots background ── */
-    body::before{content:'';position:fixed;top:-40%;left:-20%;width:600px;height:600px;background:radial-gradient(circle,rgba(124,131,253,.06) 0%,transparent 70%);pointer-events:none;z-index:0}
-    body::after{content:'';position:fixed;bottom:-20%;right:-10%;width:500px;height:500px;background:radial-gradient(circle,rgba(34,211,238,.04) 0%,transparent 70%);pointer-events:none;z-index:0}
-    .content,.topbar,.sidebar{position:relative;z-index:1}
+    .stat-box .lbl {
+      font-size: 11px;
+      color: #718096;
+      margin-top: 4px;
+    }
 
-    /* ── Scrollbar ── */
-    ::-webkit-scrollbar{width:4px}
-    ::-webkit-scrollbar-track{background:var(--bg2)}
-    ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+    /* ── KPI strip ── */
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .kpi-box {
+      background: #f7f8fc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .kpi-box .kv {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1a1f36;
+      line-height: 1;
+    }
+
+    .kpi-box .kl {
+      font-size: 11px;
+      color: #718096;
+      margin-top: 4px;
+    }
+
+    /* ── Duration bars ── */
+    .dur-bar-wrap { padding: 4px 0; }
+
+    .dur-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .dur-row:last-child { margin-bottom: 0; }
+
+    .dur-label {
+      font-size: 12px;
+      color: #4a5568;
+      width: 110px;
+      flex-shrink: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .dur-track {
+      flex: 1;
+      background: #f0f2f5;
+      border-radius: 4px;
+      height: 8px;
+      overflow: hidden;
+    }
+
+    .dur-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.9s ease;
+    }
+
+    .dur-val {
+      font-size: 11px;
+      color: #718096;
+      width: 55px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* ── Three-col layout ── */
+    .row3 { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+
+    /* ── Loading spinner ── */
+    .spinner {
+      display: inline-block;
+      width: 18px; height: 18px;
+      border: 2px solid #e2e8f0;
+      border-top-color: #7c83fd;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-text { color: #a0aec0; font-size: 13px; }
+    .error-text   { color: #e53e3e; font-size: 13px; }
   </style>
 </head>
 <body>
 
+<!-- ══════════════════════════════════════
+     SIDEBAR
+══════════════════════════════════════ -->
 <aside class="sidebar">
   <div class="sidebar-brand">
-    <div class="brand-logo">
-      <div class="brand-icon">▲</div>
-      <span class="brand-name">LogiOps</span>
-    </div>
-    <div class="brand-sub">Delivery Management System</div>
+    <h5>&#9650; LogiOps</h5>
+    <p>Delivery Management System</p>
   </div>
+
   <nav class="sidebar-nav">
-    <div class="nav-label">Main</div>
-    <a href="index.html" class="active"><i class="bi bi-speedometer2"></i> Dashboard</a>
-    <div class="nav-label">Manage</div>
+    <div class="nav-section-label">Main</div>
+    <a href="index.html" class="active">
+      <i class="bi bi-speedometer2"></i> Dashboard
+    </a>
+
+    <div class="nav-section-label">Manage</div>
     <a href="pages/drivers.html"><i class="bi bi-person-badge"></i> Drivers</a>
     <a href="pages/vehicles.html"><i class="bi bi-truck"></i> Vehicles</a>
     <a href="pages/orders.html"><i class="bi bi-box-seam"></i> Orders</a>
@@ -157,324 +392,539 @@
     <a href="pages/locations.html"><i class="bi bi-geo-alt"></i> Locations</a>
     <a href="pages/routes.html"><i class="bi bi-signpost-split"></i> Routes</a>
     <a href="pages/servicehistory.html"><i class="bi bi-tools"></i> Service History</a>
-    <div class="nav-label">Analytics</div>
+
+    <div class="nav-section-label">Analytics</div>
     <a href="pages/reports.html"><i class="bi bi-bar-chart-line"></i> Reports</a>
-    <div class="nav-label">Chapter 4</div>
+
+    <div class="nav-section-label">Chapter 4</div>
     <a href="pages/normalization.html"><i class="bi bi-diagram-3"></i> Normalization</a>
   </nav>
+
   <div class="sidebar-footer">
-    <div class="online-dot"></div>
-    logistics_db connected
+    logistics_db &nbsp;|&nbsp; MySQL
   </div>
 </aside>
 
+<!-- ══════════════════════════════════════
+     MAIN CONTENT
+══════════════════════════════════════ -->
 <div class="main">
+
+  <!-- Topbar -->
   <div class="topbar">
-    <div class="topbar-left">
-      <h4>Dashboard</h4>
-      <p>Logistics & Delivery Operations Management System</p>
-    </div>
+    <h4><i class="bi bi-speedometer2 me-2"></i>Dashboard</h4>
     <div class="topbar-right">
-      <div class="db-chip"><i class="bi bi-circle-fill" style="font-size:7px"></i> MySQL Online</div>
-      <div class="time-chip" id="clock">--:--:--</div>
+      <span><span class="status-dot"></span>Server Online</span>
+      <span id="current-time"></span>
     </div>
   </div>
 
   <div class="content">
 
-    <!-- ── Summary cards ── -->
+    <!-- ── Summary Cards ── -->
     <div class="summary-grid">
-      <a class="s-card" href="pages/drivers.html">
-        <div class="s-icon" style="background:rgba(124,131,253,.15)"><i class="bi bi-person-badge" style="color:var(--accent)"></i></div>
-        <div class="s-info">
-          <h3 id="c-drivers"><span class="spinner"></span></h3>
+
+      <a class="summary-card" href="pages/drivers.html">
+        <div class="card-icon" style="background:#ede9fe">
+          <i class="bi bi-person-badge" style="color:#7c3aed"></i>
+        </div>
+        <div class="card-info">
+          <h3 id="count-drivers"><span class="spinner"></span></h3>
           <p>Total Drivers</p>
         </div>
-        <span class="s-trend">↑ Active</span>
       </a>
-      <a class="s-card" href="pages/vehicles.html">
-        <div class="s-icon" style="background:rgba(34,211,238,.12)"><i class="bi bi-truck" style="color:var(--cyan)"></i></div>
-        <div class="s-info">
-          <h3 id="c-vehicles"><span class="spinner"></span></h3>
+
+      <a class="summary-card" href="pages/vehicles.html">
+        <div class="card-icon" style="background:#dbeafe">
+          <i class="bi bi-truck" style="color:#2563eb"></i>
+        </div>
+        <div class="card-info">
+          <h3 id="count-vehicles"><span class="spinner"></span></h3>
           <p>Total Vehicles</p>
         </div>
-        <span class="s-trend" style="color:var(--cyan)">Fleet</span>
       </a>
-      <a class="s-card" href="pages/orders.html">
-        <div class="s-icon" style="background:rgba(251,191,36,.1)"><i class="bi bi-box-seam" style="color:var(--amber)"></i></div>
-        <div class="s-info">
-          <h3 id="c-orders"><span class="spinner"></span></h3>
+
+      <a class="summary-card" href="pages/orders.html">
+        <div class="card-icon" style="background:#fef3c7">
+          <i class="bi bi-box-seam" style="color:#d97706"></i>
+        </div>
+        <div class="card-info">
+          <h3 id="count-orders"><span class="spinner"></span></h3>
           <p>Total Orders</p>
         </div>
-        <span class="s-trend" style="color:var(--amber)">Orders</span>
       </a>
-      <a class="s-card" href="pages/deliveries.html">
-        <div class="s-icon" style="background:rgba(52,211,153,.1)"><i class="bi bi-send" style="color:var(--green)"></i></div>
-        <div class="s-info">
-          <h3 id="c-deliveries"><span class="spinner"></span></h3>
-          <p>Deliveries</p>
+
+      <a class="summary-card" href="pages/deliveries.html">
+        <div class="card-icon" style="background:#dcfce7">
+          <i class="bi bi-send" style="color:#16a34a"></i>
         </div>
-        <span class="s-trend" style="color:var(--green)">Done</span>
+        <div class="card-info">
+          <h3 id="count-deliveries"><span class="spinner"></span></h3>
+          <p>Total Deliveries</p>
+        </div>
       </a>
-      <a class="s-card" href="pages/assignments.html">
-        <div class="s-icon" style="background:rgba(244,114,182,.1)"><i class="bi bi-clipboard-check" style="color:var(--pink)"></i></div>
-        <div class="s-info">
-          <h3 id="c-assignments"><span class="spinner"></span></h3>
+
+      <a class="summary-card" href="pages/assignments.html">
+        <div class="card-icon" style="background:#fce7f3">
+          <i class="bi bi-clipboard-check" style="color:#db2777"></i>
+        </div>
+        <div class="card-info">
+          <h3 id="count-assignments"><span class="spinner"></span></h3>
           <p>Assignments</p>
         </div>
       </a>
-      <a class="s-card" href="pages/locations.html">
-        <div class="s-icon" style="background:rgba(248,113,113,.1)"><i class="bi bi-geo-alt" style="color:var(--red)"></i></div>
-        <div class="s-info">
-          <h3 id="c-locations"><span class="spinner"></span></h3>
+
+      <a class="summary-card" href="pages/locations.html">
+        <div class="card-icon" style="background:#ffedd5">
+          <i class="bi bi-geo-alt" style="color:#ea580c"></i>
+        </div>
+        <div class="card-info">
+          <h3 id="count-locations"><span class="spinner"></span></h3>
           <p>Locations</p>
         </div>
       </a>
-      <a class="s-card" href="pages/routes.html">
-        <div class="s-icon" style="background:rgba(34,211,238,.08)"><i class="bi bi-signpost-split" style="color:var(--cyan)"></i></div>
-        <div class="s-info">
-          <h3 id="c-routes"><span class="spinner"></span></h3>
+
+      <a class="summary-card" href="pages/routes.html">
+        <div class="card-icon" style="background:#e0f2fe">
+          <i class="bi bi-signpost-split" style="color:#0284c7"></i>
+        </div>
+        <div class="card-info">
+          <h3 id="count-routes"><span class="spinner"></span></h3>
           <p>Routes</p>
         </div>
       </a>
-      <a class="s-card" href="pages/servicehistory.html">
-        <div class="s-icon" style="background:rgba(167,139,250,.1)"><i class="bi bi-tools" style="color:var(--a2)"></i></div>
-        <div class="s-info">
-          <h3 id="c-services"><span class="spinner"></span></h3>
+
+      <a class="summary-card" href="pages/servicehistory.html">
+        <div class="card-icon" style="background:#f0fdf4">
+          <i class="bi bi-tools" style="color:#15803d"></i>
+        </div>
+        <div class="card-info">
+          <h3 id="count-services"><span class="spinner"></span></h3>
           <p>Service Records</p>
         </div>
       </a>
+
     </div>
 
-    <!-- ── Route stats + KPIs ── -->
-    <div class="row3" style="margin-bottom:16px">
-      <div class="panel">
+    <!-- ── Route Stats + KPIs ── -->
+    <div class="row3" style="margin-bottom:24px">
+
+      <div class="panel" style="margin-bottom:0">
         <div class="panel-header">
-          <h6><i class="bi bi-signpost-split" style="color:var(--cyan)"></i> Route Statistics</h6>
-          <span style="font-size:10px;color:var(--muted)">Live from DB</span>
+          <h6><i class="bi bi-signpost-split me-2"></i>Route Statistics</h6>
+          <span style="font-size:12px;color:#718096">From reports API</span>
         </div>
-        <div class="stat-row" id="route-stats-row">
-          <div class="loading"><span class="spinner"></span> Loading...</div>
+        <div class="panel-body">
+          <div class="stat-row" id="route-stats">
+            <div class="loading-text">
+              <span class="spinner"></span>Loading route stats...
+            </div>
+          </div>
         </div>
       </div>
-      <div class="panel">
+
+      <div class="panel" style="margin-bottom:0">
         <div class="panel-header">
-          <h6><i class="bi bi-activity" style="color:var(--green)"></i> System KPIs</h6>
+          <h6><i class="bi bi-activity me-2"></i>System KPIs</h6>
         </div>
-        <div class="kpi-strip" id="kpi-strip">
-          <div class="loading"><span class="spinner"></span></div>
+        <div class="panel-body">
+          <div class="kpi-strip" id="kpi-strip">
+            <div class="loading-text"><span class="spinner"></span></div>
+          </div>
         </div>
       </div>
+
     </div>
 
-    <!-- ── Two columns: Drivers + Vehicles ── -->
-    <div class="row2">
+    <!-- ── Drivers + Vehicles ── -->
+    <div class="two-col">
+
       <div class="panel">
         <div class="panel-header">
-          <h6><i class="bi bi-person-badge" style="color:var(--accent)"></i> Drivers</h6>
-          <a href="pages/drivers.html">View all →</a>
+          <h6><i class="bi bi-person-badge me-2"></i>Drivers</h6>
+          <a href="pages/drivers.html" style="font-size:12px;color:#7c83fd;text-decoration:none">
+            View all
+          </a>
         </div>
-        <table class="dt">
-          <thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>License</th></tr></thead>
-          <tbody id="t-drivers"><tr><td colspan="4" class="loading"><span class="spinner"></span> Loading...</td></tr></tbody>
-        </table>
+        <div class="panel-body" style="padding:0">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th><th>Name</th><th>Phone</th><th>License</th>
+              </tr>
+            </thead>
+            <tbody id="drivers-table">
+              <tr>
+                <td colspan="4" class="loading-text" style="padding:16px">
+                  <span class="spinner"></span>Loading...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
+
       <div class="panel">
         <div class="panel-header">
-          <h6><i class="bi bi-truck" style="color:var(--cyan)"></i> Vehicles</h6>
-          <a href="pages/vehicles.html">View all →</a>
+          <h6><i class="bi bi-truck me-2"></i>Vehicles</h6>
+          <a href="pages/vehicles.html" style="font-size:12px;color:#7c83fd;text-decoration:none">
+            View all
+          </a>
         </div>
-        <table class="dt">
-          <thead><tr><th>ID</th><th>Plate</th><th>Type</th><th>Status</th></tr></thead>
-          <tbody id="t-vehicles"><tr><td colspan="4" class="loading"><span class="spinner"></span> Loading...</td></tr></tbody>
-        </table>
+        <div class="panel-body" style="padding:0">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th><th>Plate</th><th>Type</th><th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="vehicles-table">
+              <tr>
+                <td colspan="4" class="loading-text" style="padding:16px">
+                  <span class="spinner"></span>Loading...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
+
     </div>
 
-    <!-- ── Delivery durations + Orders ── -->
-    <div class="row2">
+    <!-- ── Duration Bars + Orders ── -->
+    <div class="two-col">
+
       <div class="panel">
         <div class="panel-header">
-          <h6><i class="bi bi-bar-chart-line" style="color:var(--amber)"></i> Delivery Duration Analysis</h6>
-          <a href="pages/reports.html">Full reports →</a>
+          <h6><i class="bi bi-bar-chart-line me-2"></i>Delivery Duration Analysis</h6>
+          <a href="pages/reports.html" style="font-size:12px;color:#7c83fd;text-decoration:none">
+            Full reports
+          </a>
         </div>
-        <div class="dur-bar-wrap" id="dur-bars">
-          <div class="loading"><span class="spinner"></span> Loading...</div>
+        <div class="panel-body">
+          <div class="dur-bar-wrap" id="dur-bars">
+            <div class="loading-text"><span class="spinner"></span>Loading...</div>
+          </div>
         </div>
       </div>
+
       <div class="panel">
         <div class="panel-header">
-          <h6><i class="bi bi-box-seam" style="color:var(--amber)"></i> Recent Orders</h6>
-          <a href="pages/orders.html">View all →</a>
+          <h6><i class="bi bi-box-seam me-2"></i>Orders</h6>
+          <a href="pages/orders.html" style="font-size:12px;color:#7c83fd;text-decoration:none">
+            View all
+          </a>
         </div>
-        <table class="dt">
-          <thead><tr><th>Order ID</th><th>Date</th><th>Customer</th></tr></thead>
-          <tbody id="t-orders"><tr><td colspan="3" class="loading"><span class="spinner"></span> Loading...</td></tr></tbody>
-        </table>
+        <div class="panel-body" style="padding:0">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Order ID</th><th>Date</th><th>Customer ID</th>
+              </tr>
+            </thead>
+            <tbody id="orders-table">
+              <tr>
+                <td colspan="3" class="loading-text" style="padding:16px">
+                  <span class="spinner"></span>Loading...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
+
     </div>
 
-    <!-- ── Full delivery report ── -->
+    <!-- ── Assignments ── -->
     <div class="panel">
       <div class="panel-header">
-        <h6><i class="bi bi-table" style="color:var(--green)"></i> Full Delivery Report — Multi-Table JOIN</h6>
-        <a href="pages/reports.html">Analytics →</a>
+        <h6><i class="bi bi-clipboard-check me-2"></i>Assignments</h6>
+        <a href="pages/assignments.html" style="font-size:12px;color:#7c83fd;text-decoration:none">
+          View all
+        </a>
       </div>
-      <table class="dt">
-        <thead><tr><th>Order ID</th><th>Order Date</th><th>Driver</th><th>Vehicle Type</th><th>Duration</th></tr></thead>
-        <tbody id="t-report"><tr><td colspan="5" class="loading"><span class="spinner"></span> Loading...</td></tr></tbody>
-      </table>
+      <div class="panel-body" style="padding:0">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th><th>Delivery</th><th>Driver</th><th>Vehicle</th>
+            </tr>
+          </thead>
+          <tbody id="assignments-table">
+            <tr>
+              <td colspan="4" class="loading-text" style="padding:16px">
+                <span class="spinner"></span>Loading...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
-  </div>
-</div>
+    <!-- ── Full Delivery Report ── -->
+    <div class="panel">
+      <div class="panel-header">
+        <h6><i class="bi bi-bar-chart-line me-2"></i>Full Delivery Report</h6>
+        <a href="pages/reports.html" style="font-size:12px;color:#7c83fd;text-decoration:none">
+          View full reports
+        </a>
+      </div>
+      <div class="panel-body" style="padding:0">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Order ID</th><th>Order Date</th><th>Driver</th>
+              <th>Vehicle Type</th><th>Duration</th>
+            </tr>
+          </thead>
+          <tbody id="delivery-report-table">
+            <tr>
+              <td colspan="5" class="loading-text" style="padding:16px">
+                <span class="spinner"></span>Loading...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
 
 <script>
   const API = 'http://localhost:3000';
 
-  // Clock
-  function tick() {
-    document.getElementById('clock').textContent =
-      new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  // ── Live clock ──
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('current-time').textContent =
+      now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   }
-  setInterval(tick,1000); tick();
+  setInterval(updateClock, 1000);
+  updateClock();
 
-  async function get(url) {
-    const r = await fetch(url);
-    return r.json();
+  // ── Fetch helper ──
+  async function fetchData(url) {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Failed to fetch');
+    return res.json();
   }
 
-  // Counts
-  const countMap = [
-    ['c-drivers',     '/api/drivers'],
-    ['c-vehicles',    '/api/vehicles'],
-    ['c-orders',      '/api/orders'],
-    ['c-deliveries',  '/api/deliveries'],
-    ['c-assignments', '/api/assignments'],
-    ['c-locations',   '/api/locations'],
-    ['c-routes',      '/api/routes'],
-    ['c-services',    '/api/servicehistory'],
-  ];
-  countMap.forEach(async ([id, url]) => {
-    try {
-      const d = await get(`${API}${url}`);
-      document.getElementById(id).textContent = d.length;
-    } catch { document.getElementById(id).textContent = '—'; }
-  });
+  // ── Summary card counts ──
+  async function loadCounts() {
+    const endpoints = [
+      { id: 'count-drivers',     url: `${API}/api/drivers` },
+      { id: 'count-vehicles',    url: `${API}/api/vehicles` },
+      { id: 'count-orders',      url: `${API}/api/orders` },
+      { id: 'count-deliveries',  url: `${API}/api/deliveries` },
+      { id: 'count-assignments', url: `${API}/api/assignments` },
+      { id: 'count-locations',   url: `${API}/api/locations` },
+      { id: 'count-routes',      url: `${API}/api/routes` },
+      { id: 'count-services',    url: `${API}/api/servicehistory` },
+    ];
+    for (const ep of endpoints) {
+      try {
+        const data = await fetchData(ep.url);
+        document.getElementById(ep.id).textContent = data.length;
+      } catch {
+        document.getElementById(ep.id).textContent = '—';
+      }
+    }
+  }
 
-  // Route stats
+  // ── Route stats ──
   async function loadRouteStats() {
     try {
-      const d = await get(`${API}/api/reports/route-stats`);
-      document.getElementById('route-stats-row').innerHTML = `
-        <div class="stat-box"><div class="val">${parseFloat(d.Avg_Distance).toFixed(0)}</div><div class="lbl">Avg km</div></div>
-        <div class="stat-box"><div class="val" style="color:var(--red)">${d.Max_Distance}</div><div class="lbl">Max km</div></div>
-        <div class="stat-box"><div class="val" style="color:var(--green)">${d.Min_Distance}</div><div class="lbl">Min km</div></div>
-        <div class="stat-box"><div class="val" style="color:var(--cyan)">${d.Total_Distance}</div><div class="lbl">Total km</div></div>
+      const d = await fetchData(`${API}/api/reports/route-stats`);
+      document.getElementById('route-stats').innerHTML = `
+        <div class="stat-box">
+          <div class="val">${parseFloat(d.Avg_Distance).toFixed(1)} km</div>
+          <div class="lbl">Avg Distance</div>
+        </div>
+        <div class="stat-box">
+          <div class="val">${d.Max_Distance} km</div>
+          <div class="lbl">Max Distance</div>
+        </div>
+        <div class="stat-box">
+          <div class="val">${d.Min_Distance} km</div>
+          <div class="lbl">Min Distance</div>
+        </div>
+        <div class="stat-box">
+          <div class="val">${d.Total_Distance} km</div>
+          <div class="lbl">Total Distance</div>
+        </div>
       `;
-    } catch {}
+    } catch {
+      document.getElementById('route-stats').innerHTML =
+        '<span class="error-text">Could not load route stats</span>';
+    }
   }
 
-  // KPIs
+  // ── KPIs ──
   async function loadKPIs() {
     try {
       const [drivers, vehicles, assignments] = await Promise.all([
-        get(`${API}/api/drivers`),
-        get(`${API}/api/vehicles`),
-        get(`${API}/api/assignments`)
+        fetchData(`${API}/api/drivers`),
+        fetchData(`${API}/api/vehicles`),
+        fetchData(`${API}/api/assignments`)
       ]);
       const available = vehicles.filter(v => v.Availability_Status === 'Available').length;
       document.getElementById('kpi-strip').innerHTML = `
-        <div class="kpi"><div class="kv" style="color:var(--green)">${available}</div><div class="kl">Available Vehicles</div></div>
-        <div class="kpi"><div class="kv" style="color:var(--accent)">${drivers.length}</div><div class="kl">Active Drivers</div></div>
-        <div class="kpi"><div class="kv" style="color:var(--amber)">${assignments.length}</div><div class="kl">Total Assignments</div></div>
+        <div class="kpi-box">
+          <div class="kv" style="color:#16a34a">${available}</div>
+          <div class="kl">Available Vehicles</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kv" style="color:#7c3aed">${drivers.length}</div>
+          <div class="kl">Active Drivers</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kv" style="color:#d97706">${assignments.length}</div>
+          <div class="kl">Total Assignments</div>
+        </div>
       `;
-    } catch {}
+    } catch {
+      document.getElementById('kpi-strip').innerHTML =
+        '<span class="error-text">Could not load KPIs</span>';
+    }
   }
 
-  // Drivers table
+  // ── Drivers table ──
   async function loadDrivers() {
     try {
-      const data = await get(`${API}/api/drivers`);
-      document.getElementById('t-drivers').innerHTML = data.map(d => `
+      const data = await fetchData(`${API}/api/drivers`);
+      document.getElementById('drivers-table').innerHTML = data.map(d => `
         <tr>
-          <td style="color:var(--muted);font-family:'DM Mono',monospace">${d.Driver_id}</td>
+          <td>${d.Driver_id}</td>
           <td>${d.Name}</td>
-          <td style="font-family:'DM Mono',monospace;font-size:11px">${d.Phone_no}</td>
-          <td><span class="badge-type">${d.License_Number}</span></td>
-        </tr>`).join('');
-    } catch { document.getElementById('t-drivers').innerHTML = '<tr><td colspan="4" style="color:var(--red);padding:14px">Could not load</td></tr>'; }
+          <td>${d.Phone_no}</td>
+          <td>${d.License_Number}</td>
+        </tr>
+      `).join('');
+    } catch {
+      document.getElementById('drivers-table').innerHTML =
+        '<tr><td colspan="4" class="error-text" style="padding:16px">Could not load drivers</td></tr>';
+    }
   }
 
-  // Vehicles table
+  // ── Vehicles table ──
   async function loadVehicles() {
     try {
-      const data = await get(`${API}/api/vehicles`);
-      document.getElementById('t-vehicles').innerHTML = data.map(v => `
+      const data = await fetchData(`${API}/api/vehicles`);
+      document.getElementById('vehicles-table').innerHTML = data.map(v => `
         <tr>
-          <td style="color:var(--muted);font-family:'DM Mono',monospace">${v.Vehicle_Id}</td>
-          <td style="font-family:'DM Mono',monospace;font-size:11px">${v.Plate_Number}</td>
+          <td>${v.Vehicle_Id}</td>
+          <td>${v.Plate_Number}</td>
           <td>${v.Vehicle_Type}</td>
-          <td><span class="${v.Availability_Status==='Available'?'badge-avail':'badge-service'}">${v.Availability_Status}</span></td>
-        </tr>`).join('');
-    } catch { document.getElementById('t-vehicles').innerHTML = '<tr><td colspan="4" style="color:var(--red);padding:14px">Could not load</td></tr>'; }
+          <td>
+            <span class="${v.Availability_Status === 'Available'
+              ? 'badge-available' : 'badge-inservice'}">
+              ${v.Availability_Status}
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    } catch {
+      document.getElementById('vehicles-table').innerHTML =
+        '<tr><td colspan="4" class="error-text" style="padding:16px">Could not load vehicles</td></tr>';
+    }
   }
 
-  // Orders table
+  // ── Orders table ──
   async function loadOrders() {
     try {
-      const data = await get(`${API}/api/orders`);
-      document.getElementById('t-orders').innerHTML = data.map(o => `
+      const data = await fetchData(`${API}/api/orders`);
+      document.getElementById('orders-table').innerHTML = data.map(o => `
         <tr>
-          <td style="font-family:'DM Mono',monospace;color:var(--accent)">#${o.Order_Id}</td>
-          <td style="font-size:11px">${o.Oder_Date ? new Date(o.Oder_Date).toLocaleDateString('en-IN') : '—'}</td>
-          <td style="font-family:'DM Mono',monospace;color:var(--muted)">C-${o.Customer_Id}</td>
-        </tr>`).join('');
-    } catch {}
+          <td>${o.Order_Id}</td>
+          <td>${o.Oder_Date ? new Date(o.Oder_Date).toLocaleDateString('en-IN') : '—'}</td>
+          <td>${o.Customer_Id}</td>
+        </tr>
+      `).join('');
+    } catch {
+      document.getElementById('orders-table').innerHTML =
+        '<tr><td colspan="3" class="error-text" style="padding:16px">Could not load orders</td></tr>';
+    }
   }
 
-  // Delivery duration bars
+  // ── Assignments table ──
+  async function loadAssignments() {
+    try {
+      const data = await fetchData(`${API}/api/assignments`);
+      document.getElementById('assignments-table').innerHTML = data.map(a => `
+        <tr>
+          <td>${a.Assignment_id}</td>
+          <td>${a.Delivery_id}</td>
+          <td>${a.Driver_id}</td>
+          <td>${a.Vehicle_id}</td>
+        </tr>
+      `).join('');
+    } catch {
+      document.getElementById('assignments-table').innerHTML =
+        '<tr><td colspan="4" class="error-text" style="padding:16px">Could not load assignments</td></tr>';
+    }
+  }
+
+  // ── Delivery duration bars ──
   async function loadDurBars() {
     try {
-      const data = await get(`${API}/api/reports/full-delivery-report`);
-      const colors = ['var(--accent)','var(--cyan)','var(--green)','var(--amber)','var(--pink)'];
-      const maxDur = Math.max(...data.map(r => {
-        const p = r.Duration ? r.Duration.split(':') : [4,0,0];
-        return parseInt(p[0])*60 + parseInt(p[1]||0);
-      }));
-      document.getElementById('dur-bars').innerHTML = data.map((r,i) => {
-        const p = r.Duration ? r.Duration.split(':') : [4,0,0];
-        const mins = parseInt(p[0])*60 + parseInt(p[1]||0);
-        const pct  = Math.round((mins/maxDur)*100);
+      const data  = await fetchData(`${API}/api/reports/full-delivery-report`);
+      const colors = ['#7c83fd','#2563eb','#16a34a','#d97706','#db2777'];
+      const getMins = dur => {
+        if (!dur) return 240;
+        const p = dur.split(':');
+        return parseInt(p[0]) * 60 + parseInt(p[1] || 0);
+      };
+      const maxMins = Math.max(...data.map(r => getMins(r.Duration)));
+      document.getElementById('dur-bars').innerHTML = data.map((r, i) => {
+        const pct = Math.round((getMins(r.Duration) / maxMins) * 100);
         return `
           <div class="dur-row">
             <div class="dur-label">${r.Driver_Name}</div>
-            <div class="dur-bar-bg">
-              <div class="dur-bar-fill" style="width:${pct}%;background:${colors[i%colors.length]}"></div>
+            <div class="dur-track">
+              <div class="dur-fill"
+                   style="width:${pct}%;background:${colors[i % colors.length]}">
+              </div>
             </div>
             <div class="dur-val">${r.Duration}</div>
           </div>`;
       }).join('');
-    } catch {}
+    } catch {
+      document.getElementById('dur-bars').innerHTML =
+        '<span class="error-text">Could not load duration data</span>';
+    }
   }
 
-  // Full delivery report
-  async function loadReport() {
+  // ── Full delivery report ──
+  async function loadDeliveryReport() {
     try {
-      const data = await get(`${API}/api/reports/full-delivery-report`);
-      document.getElementById('t-report').innerHTML = data.map(r => `
+      const data = await fetchData(`${API}/api/reports/full-delivery-report`);
+      document.getElementById('delivery-report-table').innerHTML = data.map(r => `
         <tr>
-          <td style="font-family:'DM Mono',monospace;color:var(--accent)">#${r.Order_Id}</td>
-          <td style="font-size:11px">${r.Oder_Date ? new Date(r.Oder_Date).toLocaleDateString('en-IN') : '—'}</td>
+          <td>${r.Order_Id}</td>
+          <td>${r.Oder_Date ? new Date(r.Oder_Date).toLocaleDateString('en-IN') : '—'}</td>
           <td>${r.Driver_Name}</td>
-          <td><span class="badge-type">${r.Vehicle_Type}</span></td>
-          <td><span style="background:rgba(52,211,153,.1);color:var(--green);padding:2px 9px;border-radius:20px;font-size:11px;font-family:'DM Mono',monospace;border:1px solid rgba(52,211,153,.2)">${r.Duration}</span></td>
-        </tr>`).join('');
-    } catch {}
+          <td>${r.Vehicle_Type}</td>
+          <td>${r.Duration}</td>
+        </tr>
+      `).join('');
+    } catch {
+      document.getElementById('delivery-report-table').innerHTML =
+        '<tr><td colspan="5" class="error-text" style="padding:16px">Could not load report</td></tr>';
+    }
   }
 
-  loadRouteStats(); loadKPIs(); loadDrivers();
-  loadVehicles(); loadOrders(); loadDurBars(); loadReport();
+  // ── Load everything ──
+  loadCounts();
+  loadRouteStats();
+  loadKPIs();
+  loadDrivers();
+  loadVehicles();
+  loadOrders();
+  loadAssignments();
+  loadDurBars();
+  loadDeliveryReport();
 </script>
+
 </body>
 </html>
